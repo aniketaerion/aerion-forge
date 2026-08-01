@@ -1,6 +1,22 @@
 ﻿# Aerion Forge Architecture
 
-Version 0.2 Milestone 1.5 preserves the audit, workspace, discovery, indexing, and graph boundaries.
+Version 0.2 Milestone 1.7 preserves all existing subsystem boundaries.
+
+## Runtime readiness
+
+```text
+Unified Runtime Configuration
+             ↓
+Capability Registry
+             ↓
+Runtime Health & Diagnostics
+             ↓
+Readiness Evidence for Future Planning
+```
+
+Diagnostics consumes safe Workspace, Discovery, Index, Knowledge Graph, Capability, and
+Configuration stores plus report paths and shared repository policy. It does not regenerate or
+repair state and never executes target code. Phase 2 may consume readiness later.
 
 ```text
 Workspace Manager -> Repository Discovery -> Incremental Project Index

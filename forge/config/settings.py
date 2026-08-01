@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     capability_include_planned: bool = True
     capability_strict_validation: bool = True
     capability_history_limit: int = Field(default=5, ge=0, le=100)
+    diagnostics_enabled: bool = True
+    diagnostics_strict: bool = True
+    diagnostics_history_limit: int = Field(default=5, ge=0, le=100)
+    diagnostics_include_optional: bool = True
+    diagnostics_write_probe_enabled: bool = True
     allow_shell: bool = False
     allow_docker: bool = False
     allow_database: bool = False
@@ -127,6 +132,11 @@ class Settings(BaseSettings):
             capability_include_planned=bool(values["capabilities.include_planned"]),
             capability_strict_validation=bool(values["capabilities.strict_validation"]),
             capability_history_limit=int(values["capabilities.history_limit"]),
+            diagnostics_enabled=bool(values["diagnostics.enabled"]),
+            diagnostics_strict=bool(values["diagnostics.strict"]),
+            diagnostics_history_limit=int(values["diagnostics.history_limit"]),
+            diagnostics_include_optional=bool(values["diagnostics.include_optional"]),
+            diagnostics_write_probe_enabled=bool(values["diagnostics.write_probe_enabled"]),
             allow_shell=bool(values["security.allow_shell"]),
             allow_docker=bool(values["security.allow_docker"]),
             allow_database=bool(values["security.allow_database"]),

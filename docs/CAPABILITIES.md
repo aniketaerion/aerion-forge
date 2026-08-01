@@ -1,5 +1,9 @@
 # Capability Registry
 
+Milestone 1.7 promotes `runtime-health-diagnostics` to stable, implemented, and available. The
+registry remains 31 total: 7 implemented/available and 24 planned/unavailable. Diagnostics uses
+runtime configuration and the registry with a documented bootstrap rule.
+
 The Capability Registry is Forge's deterministic control-plane contract. It describes what Forge
 can do; it never executes capabilities, traverses targets, loads plugins, or infers features from
 installed modules.
@@ -52,8 +56,8 @@ Future planners and execution controllers may consult this registry. Mission pla
 test generation, ERP analysis, dynamic plugins, networks, and capability execution remain out of
 scope.
 
-Milestone 1.6 promotes `runtime-configuration` to stable, implemented, and available. Totals are six
-implemented/available and 25 planned/unavailable; diagnostics and release validation remain planned.
+Milestone 1.7 promotes `runtime-health-diagnostics` to stable, implemented, and available. Totals
+are seven implemented/available and 24 planned/unavailable; release validation remains planned.
 
 ## Errors And Contract Stability
 

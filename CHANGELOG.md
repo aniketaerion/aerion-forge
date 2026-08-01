@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## Version 0.2 - Milestone 1.7
+
+- Added typed runtime health and target readiness with a static 30-check catalogue.
+- Added safe evidence/actions, cross-store consistency/freshness, deterministic fingerprints,
+  atomic state/reports, query API, and `health`/`diagnose` commands.
+- Promoted `runtime-health-diagnostics`: 7 capabilities are available and 24 remain planned.
+
 ## Version 0.2 - Milestone 1.6
 
 - Added unified typed runtime configuration with profiles, TOML, canonical environment variables,

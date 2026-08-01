@@ -1,6 +1,9 @@
 ﻿# Aerion Forge
 
-Aerion Forge Version 0.2 Milestone 1.5 is a local, multi-workspace engineering platform. Its
+Milestone 1.7 adds deterministic local runtime health and target-readiness diagnostics. Use
+`forge health` and `forge diagnose [TARGET]`; see `docs/DIAGNOSTICS.md`.
+
+Aerion Forge Version 0.2 is a local, multi-workspace engineering platform. Its
 deterministic Capability Registry truthfully declares completed and planned functionality. Run
 `forge capabilities` or `forge capability capability-registry`; see `docs/CAPABILITIES.md`.
 The schema contract and hardening evidence are in `docs/contracts/` and `docs/audits/`.

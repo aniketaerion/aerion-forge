@@ -192,6 +192,11 @@ def setting_definitions() -> tuple[SettingDefinition, ...]:
         _d("security.allow_shell", T.BOOLEAN, False, aliases=("AERION_ALLOW_SHELL",)),
         _d("security.allow_docker", T.BOOLEAN, False, aliases=("AERION_ALLOW_DOCKER",)),
         _d("security.allow_database", T.BOOLEAN, False, aliases=("AERION_ALLOW_DATABASE",)),
+        _d("diagnostics.enabled", T.BOOLEAN, True),
+        _d("diagnostics.strict", T.BOOLEAN, True),
+        _d("diagnostics.history_limit", T.INTEGER, 5, minimum=0, maximum=100),
+        _d("diagnostics.include_optional", T.BOOLEAN, True),
+        _d("diagnostics.write_probe_enabled", T.BOOLEAN, True),
         _d(
             "cli.default_output_format",
             T.ENUM,

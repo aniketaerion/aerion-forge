@@ -340,16 +340,47 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
             docs=("docs/CONFIGURATION.md", "docs/contracts/RUNTIME_CONFIGURATION_CONTRACT.md"),
             limitations=("Configuration is local and requires restart after applicable changes.",),
         ),
-    )
-    specs = (
-        (
+        _completed(
             "runtime-health-diagnostics",
             "Runtime Health Diagnostics",
+            "Diagnoses local Forge runtime and repository-understanding readiness.",
             "1.7",
             Category.DIAGNOSTICS,
-            Access.READ_ONLY,
-            Approval.NONE,
+            requires=("runtime-configuration", "capability-registry"),
+            inputs=(
+                _input("configuration", InputType.CONFIGURATION),
+                _input("workspace-state", InputType.WORKSPACE_STATE, required=False),
+                _input("discovery-state", InputType.DISCOVERY_STATE, required=False),
+                _input("index-state", InputType.INDEX_STATE, required=False),
+                _input("knowledge-graph-state", InputType.KNOWLEDGE_GRAPH_STATE, required=False),
+            ),
+            outputs=(
+                _output(
+                    "diagnostic-state", OutputType.DIAGNOSTIC_RESULT, "memory/diagnostics.json"
+                ),
+                _output(
+                    "diagnostic-json",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/DIAGNOSTIC_RESULTS.json",
+                ),
+                _output(
+                    "diagnostic-summary",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/DIAGNOSTIC_SUMMARY.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge health", description="Diagnose the Forge runtime.", primary=True
+                ),
+                Command(command="forge diagnose", description="Diagnose target readiness."),
+            ),
+            scope=Scope.GLOBAL,
+            docs=("docs/DIAGNOSTICS.md", "docs/contracts/RUNTIME_DIAGNOSTICS_CONTRACT.md"),
+            limitations=("Local, on-demand, read-only diagnosis; no automatic remediation.",),
         ),
+    )
+    specs = (
         (
             "phase-validation-release",
             "Phase Validation Release",

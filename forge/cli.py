@@ -34,6 +34,19 @@ from forge.capabilities.models import (
 from forge.config import Settings
 from forge.configuration.cli import config_app
 from forge.core import LoggingManager
+from forge.diagnostics import DiagnosticService
+from forge.diagnostics.errors import (
+    DiagnosticError,
+    DiagnosticNotFoundError,
+    DiagnosticPersistenceError,
+    DiagnosticReportError,
+    DiagnosticSchemaMismatchError,
+    DiagnosticsDisabledError,
+    DiagnosticStoreCorruptionError,
+    DiagnosticTargetNotFoundError,
+    DiagnosticValidationError,
+)
+from forge.diagnostics.models import DiagnosticCategory, DiagnosticConfiguration, HealthStatus
 from forge.discovery import DiscoveryError, DiscoveryService
 from forge.indexing import (
     IndexConfiguration,
@@ -138,6 +151,166 @@ def _settings(repository: Path | None = None, reports: Path | None = None) -> Se
         settings = Settings.from_runtime()
     settings.ensure_runtime_directories()
     return settings
+
+
+def _diagnostic_service(settings: Settings) -> DiagnosticService:
+    return DiagnosticService(
+        Path.cwd(),
+        settings.memory_path,
+        settings.reports_path,
+        DiagnosticConfiguration(
+            enabled=settings.diagnostics_enabled,
+            strict=settings.diagnostics_strict,
+            history_limit=settings.diagnostics_history_limit,
+            include_optional=settings.diagnostics_include_optional,
+            write_probe_enabled=settings.diagnostics_write_probe_enabled,
+        ),
+    )
+
+
+def _diagnostic_exit(status: HealthStatus, strict: bool) -> int:
+    if status is HealthStatus.UNHEALTHY:
+        return 4
+    if status is HealthStatus.DEGRADED:
+        return 3
+    if status is HealthStatus.UNKNOWN and strict:
+        return 5
+    return 0
+
+
+def _diagnostic_category(value: str | None) -> tuple[DiagnosticCategory, ...]:
+    if value is None:
+        return ()
+    normalized = value.replace("-", "_")
+    try:
+        return (DiagnosticCategory(normalized),)
+    except ValueError as exc:
+        raise DiagnosticNotFoundError(f"Unknown diagnostic category: {value}") from exc
+
+
+def _print_diagnostics(snapshot: object, json_output: bool, summary: bool, verbose: bool) -> None:
+    from forge.diagnostics.models import DiagnosticSnapshot
+
+    if not isinstance(snapshot, DiagnosticSnapshot):
+        return
+    if json_output:
+        console.print_json(snapshot.model_dump_json(indent=2))
+        return
+    totals = snapshot.summary
+    console.print(f"[bold]Overall Status:[/bold] {totals.overall_status.value.upper()}")
+    console.print(f"Healthy Count: {totals.healthy_count}")
+    console.print(f"Degraded Count: {totals.degraded_count}")
+    console.print(f"Unhealthy Count: {totals.unhealthy_count}")
+    console.print(f"Unknown Count: {totals.unknown_count}")
+    console.print(f"Blocking Count: {totals.blocking_count}")
+    if summary:
+        return
+    for item in snapshot.results:
+        if item.status in {HealthStatus.HEALTHY, HealthStatus.NOT_APPLICABLE} and not verbose:
+            continue
+        console.print(f"[bold]{item.check_id}[/bold]: {item.status.value} — {item.summary}")
+        if verbose:
+            for evidence in item.evidence:
+                console.print(f"  {evidence.label}: {evidence.safe_value}")
+            for corrective in item.corrective_actions:
+                console.print(f"  Action: {corrective.command or corrective.description}")
+
+
+def _run_diagnostic_cli(
+    *,
+    target: str | None,
+    target_mode: bool,
+    json_output: bool,
+    summary: bool,
+    verbose: bool,
+    category: str | None,
+    check_id: str | None,
+    strict: bool,
+) -> None:
+    settings = _settings()
+    try:
+        service = _diagnostic_service(settings)
+        categories = _diagnostic_category(category)
+        result = (
+            service.diagnose(target, categories=categories, check_id=check_id, strict=strict)
+            if target_mode
+            else service.health(categories=categories, check_id=check_id, strict=strict)
+        )
+        _print_diagnostics(result.snapshot, json_output, summary, verbose)
+        code = _diagnostic_exit(result.snapshot.summary.overall_status, strict)
+        if code:
+            raise typer.Exit(code=code)
+    except (DiagnosticNotFoundError, DiagnosticTargetNotFoundError) as exc:
+        console.print(f"[bold red]Diagnostic input error:[/bold red] {exc}")
+        raise typer.Exit(code=2) from exc
+    except DiagnosticsDisabledError as exc:
+        console.print(f"[bold red]Diagnostics disabled:[/bold red] {exc}")
+        raise typer.Exit(code=6) from exc
+    except DiagnosticStoreCorruptionError as exc:
+        console.print(f"[bold red]Diagnostic store corrupt:[/bold red] {exc}")
+        raise typer.Exit(code=11) from exc
+    except DiagnosticSchemaMismatchError as exc:
+        console.print(f"[bold red]Diagnostic schema error:[/bold red] {exc}")
+        raise typer.Exit(code=12) from exc
+    except DiagnosticReportError as exc:
+        console.print(f"[bold red]Diagnostic report error:[/bold red] {exc}")
+        raise typer.Exit(code=10) from exc
+    except DiagnosticPersistenceError as exc:
+        console.print(f"[bold red]Diagnostic persistence error:[/bold red] {exc}")
+        raise typer.Exit(code=9) from exc
+    except DiagnosticValidationError as exc:
+        console.print(f"[bold red]Diagnostic validation error:[/bold red] {exc}")
+        raise typer.Exit(code=8) from exc
+    except DiagnosticError as exc:
+        console.print(f"[bold red]Diagnostic failure:[/bold red] {exc}")
+        raise typer.Exit(code=7) from exc
+
+
+@app.command()
+def health(
+    json_output: Annotated[bool, typer.Option("--json")] = False,
+    summary: Annotated[bool, typer.Option("--summary")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose")] = False,
+    category: Annotated[str | None, typer.Option("--category")] = None,
+    check_id: Annotated[str | None, typer.Option("--check")] = None,
+    strict: Annotated[bool, typer.Option("--strict")] = False,
+) -> None:
+    """Diagnose the local Forge runtime."""
+    _run_diagnostic_cli(
+        target=None,
+        target_mode=False,
+        json_output=json_output,
+        summary=summary,
+        verbose=verbose,
+        category=category,
+        check_id=check_id,
+        strict=strict,
+    )
+
+
+@app.command()
+def diagnose(
+    target: Annotated[
+        str | None, typer.Argument(help="Workspace name, ID, or repository path.")
+    ] = None,
+    json_output: Annotated[bool, typer.Option("--json")] = False,
+    summary: Annotated[bool, typer.Option("--summary")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose")] = False,
+    category: Annotated[str | None, typer.Option("--category")] = None,
+    check_id: Annotated[str | None, typer.Option("--check")] = None,
+    strict: Annotated[bool, typer.Option("--strict")] = False,
+) -> None:
+    """Diagnose Forge readiness for a workspace or repository."""
+    _run_diagnostic_cli(
+        target=target,
+        target_mode=True,
+        json_output=json_output,
+        summary=summary,
+        verbose=verbose,
+        category=category,
+        check_id=check_id,
+        strict=strict,
+    )
 
 
 @app.command()

@@ -1,5 +1,9 @@
 # Unified Runtime Configuration
 
+Diagnostics adds `diagnostics.enabled` (true), `diagnostics.strict` (true),
+`diagnostics.history_limit` (5), `diagnostics.include_optional` (true), and
+`diagnostics.write_probe_enabled` (true). Diagnostics never parses the environment directly.
+
 Forge resolves typed settings through one precedence chain: defaults, profile, Forge TOML,
 compatibility aliases, canonical `FORGE_` environment variables, then command-local `--set`
 overrides. It never searches parent or target repositories, edits sources, loads plugins, executes
