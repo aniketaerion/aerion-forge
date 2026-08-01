@@ -4,6 +4,8 @@ Aerion Forge Version 0.2 Milestone 1.5 is a local, multi-workspace engineering p
 deterministic Capability Registry truthfully declares completed and planned functionality. Run
 `forge capabilities` or `forge capability capability-registry`; see `docs/CAPABILITIES.md`.
 The schema contract and hardening evidence are in `docs/contracts/` and `docs/audits/`.
+Milestone 1.6 adds unified runtime configuration; run `forge config show` and see
+`docs/CONFIGURATION.md`.
 
 ## Installation
 

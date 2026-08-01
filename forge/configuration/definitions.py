@@ -1,0 +1,203 @@
+"""Explicit canonical Forge runtime setting catalogue."""
+
+from typing import Any
+
+from forge.configuration.models import SettingDefinition
+from forge.configuration.models import SettingValueType as T
+
+
+def _d(
+    key: str,
+    kind: T,
+    default: Any,
+    *,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    allowed: tuple[str, ...] = (),
+    sensitive: bool = False,
+    restart: bool = False,
+    deterministic: bool = True,
+    aliases: tuple[str, ...] = (),
+) -> SettingDefinition:
+    namespace, name = key.split(".", 1)
+    env = "FORGE_" + key.upper().replace(".", "_")
+    return SettingDefinition(
+        key=key,
+        namespace=namespace,
+        name=name.replace("_", " ").title(),
+        description=f"Forge runtime setting {key}.",
+        value_type=kind,
+        default_value=default,
+        environment_variable=env,
+        compatibility_environment_variables=aliases,
+        configuration_file_key=key,
+        minimum=minimum,
+        maximum=maximum,
+        allowed_values=allowed,
+        sensitive=sensitive,
+        restart_required=restart,
+        affects_determinism=deterministic,
+        tags=(namespace,),
+    )
+
+
+def setting_definitions() -> tuple[SettingDefinition, ...]:
+    values = (
+        _d(
+            "core.profile",
+            T.ENUM,
+            "development",
+            allowed=("ci", "development", "production", "test"),
+            aliases=("FORGE_PROFILE",),
+        ),
+        _d("core.strict_validation", T.BOOLEAN, True, aliases=("AERION_CORE_STRICT_VALIDATION",)),
+        _d(
+            "core.command_timeout",
+            T.DURATION,
+            120,
+            minimum=1,
+            maximum=3600,
+            aliases=("AERION_COMMAND_TIMEOUT_SECONDS",),
+        ),
+        _d("core.ollama_model", T.STRING, "qwen2.5-coder:7b", aliases=("AERION_OLLAMA_MODEL",)),
+        _d(
+            "core.ollama_base_url",
+            T.STRING,
+            "http://localhost:11434",
+            aliases=("AERION_OLLAMA_BASE_URL",),
+        ),
+        _d(
+            "workspace.store_path",
+            T.PATH,
+            "memory/workspaces.json",
+            restart=True,
+            aliases=("AERION_WORKSPACE_PATH",),
+        ),
+        _d("discovery.manifest_max_bytes", T.BYTE_SIZE, 1_000_000, minimum=1),
+        _d("discovery.max_files", T.INTEGER, 250_000, minimum=1),
+        _d(
+            "indexing.max_file_size",
+            T.BYTE_SIZE,
+            10 * 1024 * 1024,
+            minimum=1024,
+            aliases=("AERION_INDEX_MAX_HASH_BYTES",),
+        ),
+        _d(
+            "indexing.max_files", T.INTEGER, 250_000, minimum=1, aliases=("AERION_INDEX_MAX_FILES",)
+        ),
+        _d(
+            "indexing.chunk_size",
+            T.BYTE_SIZE,
+            64 * 1024,
+            minimum=1024,
+            maximum=1024 * 1024,
+            aliases=("AERION_INDEX_HASH_CHUNK_BYTES",),
+        ),
+        _d("indexing.large_file_sample_size", T.BYTE_SIZE, 64 * 1024, minimum=1024),
+        _d(
+            "knowledge_graph.max_nodes",
+            T.INTEGER,
+            100_000,
+            minimum=1,
+            aliases=("AERION_GRAPH_MAX_NODES", "FORGE_GRAPH_MAX_NODES"),
+        ),
+        _d(
+            "knowledge_graph.max_edges",
+            T.INTEGER,
+            300_000,
+            minimum=1,
+            aliases=("AERION_GRAPH_MAX_EDGES", "FORGE_GRAPH_MAX_EDGES"),
+        ),
+        _d(
+            "knowledge_graph.max_module_depth",
+            T.INTEGER,
+            2,
+            minimum=1,
+            maximum=10,
+            aliases=("AERION_GRAPH_MAX_MODULE_DEPTH",),
+        ),
+        _d(
+            "knowledge_graph.include_directory_nodes",
+            T.BOOLEAN,
+            True,
+            aliases=("AERION_GRAPH_INCLUDE_DIRECTORY_NODES",),
+        ),
+        _d("knowledge_graph.history_limit", T.INTEGER, 5, minimum=0),
+        _d("knowledge_graph.strict_validation", T.BOOLEAN, True),
+        _d(
+            "capabilities.registry_enabled",
+            T.BOOLEAN,
+            True,
+            aliases=("AERION_CAPABILITY_REGISTRY_ENABLED",),
+        ),
+        _d(
+            "capabilities.disabled_ids",
+            T.STRING_LIST,
+            (),
+            aliases=("AERION_CAPABILITY_DISABLED_IDS",),
+        ),
+        _d(
+            "capabilities.include_planned",
+            T.BOOLEAN,
+            True,
+            aliases=("AERION_CAPABILITY_INCLUDE_PLANNED",),
+        ),
+        _d(
+            "capabilities.strict_validation",
+            T.BOOLEAN,
+            True,
+            aliases=("AERION_CAPABILITY_STRICT_VALIDATION",),
+        ),
+        _d(
+            "capabilities.history_limit",
+            T.INTEGER,
+            5,
+            minimum=0,
+            maximum=100,
+            aliases=("AERION_CAPABILITY_HISTORY_LIMIT",),
+        ),
+        _d(
+            "reporting.output_directory",
+            T.PATH,
+            "reports/latest",
+            restart=True,
+            aliases=("AERION_REPORTS_PATH",),
+        ),
+        _d("reporting.atomic_writes", T.BOOLEAN, True),
+        _d(
+            "persistence.memory_directory",
+            T.PATH,
+            "memory",
+            restart=True,
+            aliases=("AERION_MEMORY_PATH",),
+        ),
+        _d("persistence.history_limit", T.INTEGER, 5, minimum=0, maximum=100),
+        _d(
+            "logging.level",
+            T.ENUM,
+            "INFO",
+            allowed=("CRITICAL", "DEBUG", "ERROR", "INFO", "WARNING"),
+            deterministic=False,
+            aliases=("AERION_LOG_LEVEL",),
+        ),
+        _d("logging.verbose", T.BOOLEAN, False, deterministic=False),
+        _d("security.redact_sensitive_values", T.BOOLEAN, True),
+        _d(
+            "security.api_token",
+            T.OPTIONAL_STRING,
+            None,
+            sensitive=True,
+            aliases=("AERION_API_TOKEN",),
+        ),
+        _d("security.allow_shell", T.BOOLEAN, False, aliases=("AERION_ALLOW_SHELL",)),
+        _d("security.allow_docker", T.BOOLEAN, False, aliases=("AERION_ALLOW_DOCKER",)),
+        _d("security.allow_database", T.BOOLEAN, False, aliases=("AERION_ALLOW_DATABASE",)),
+        _d(
+            "cli.default_output_format",
+            T.ENUM,
+            "table",
+            allowed=("json", "table"),
+            deterministic=False,
+        ),
+    )
+    return tuple(sorted(values, key=lambda x: x.key))

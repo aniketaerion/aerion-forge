@@ -7,6 +7,9 @@ Workspace Manager -> Repository Discovery -> Incremental Project Index
                   -> Engineering Knowledge Graph -> Capability Registry
 ```
 
+Unified Runtime Configuration is the typed Forge-local foundation beneath capability and repository
+services. It exposes safe immutable snapshots and never inspects target repositories.
+
 The registry is a global control-plane metadata service, not a downstream analysis stage. It does
 not traverse repositories or execute capabilities. Future systems consult it before operations.
 Its IDs, schema, public models, lifecycle and dependency semantics, queries, CLI, persistence path,

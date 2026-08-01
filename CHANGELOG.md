@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## Version 0.2 - Milestone 1.6
+
+- Added unified typed runtime configuration with profiles, TOML, canonical environment variables,
+  aliases, CLI overrides, provenance, validation, redaction, snapshots, persistence, reports, query
+  API, CLI, compatibility migration, tests, and documentation.
+- Promoted only `runtime-configuration`; diagnostics and release automation remain planned.
+
 ## Version 0.2 - Milestone 1.5.4
 
 - Independently reproduced catalogue, determinism, persistence, exclusion, CLI, query, security,

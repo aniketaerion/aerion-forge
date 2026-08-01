@@ -80,6 +80,7 @@ IMPLEMENTED_IDS = {
     "incremental-project-index",
     "engineering-knowledge-graph",
     "capability-registry",
+    "runtime-configuration",
 }
 
 
@@ -132,7 +133,7 @@ def test_exact_approved_catalogue_and_real_contract_paths() -> None:
         for item in catalogue
         if item.implementation_status is CapabilityImplementationStatus.IMPLEMENTED
     } == IMPLEMENTED_IDS
-    assert sum(item.lifecycle is CapabilityLifecycle.PLANNED for item in catalogue) == 26
+    assert sum(item.lifecycle is CapabilityLifecycle.PLANNED for item in catalogue) == 25
     root = Path(__file__).resolve().parents[1]
     assert all((root / path).is_file() for item in catalogue for path in item.documentation_paths)
     subsystem = {
@@ -141,6 +142,7 @@ def test_exact_approved_catalogue_and_real_contract_paths() -> None:
         "incremental-project-index": "indexing",
         "engineering-knowledge-graph": "knowledge",
         "capability-registry": "capabilities",
+        "runtime-configuration": "configuration",
     }
     assert all((root / "forge" / subsystem[item]).is_dir() for item in IMPLEMENTED_IDS)
 
@@ -330,8 +332,8 @@ def test_query_contract_is_sorted_read_only_and_complete() -> None:
     assert query.get_capability("capability-registry").capability_id == "capability-registry"
     assert [x.capability_id for x in query.list_capabilities()] == sorted(APPROVED_IDS)
     assert (
-        len(query.list_available_capabilities()) == 5
-        and len(query.list_planned_capabilities()) == 26
+        len(query.list_available_capabilities()) == 6
+        and len(query.list_planned_capabilities()) == 25
     )
     assert query.get_capabilities_by_category(CapabilityCategory.KNOWLEDGE)
     assert query.get_capabilities_for_project_type("React")

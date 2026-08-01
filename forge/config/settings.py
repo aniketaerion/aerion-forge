@@ -1,5 +1,6 @@
 """Validated application configuration loaded from environment variables."""
 
+import os
 from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -99,6 +100,46 @@ class Settings(BaseSettings):
                 {item.strip() for item in self.capability_disabled_ids.split(",") if item.strip()}
             )
         )
+
+    @classmethod
+    def from_runtime(cls) -> "Settings":
+        """Build the compatibility facade from the canonical runtime resolver."""
+        from forge.configuration.resolver import ConfigurationResolver
+
+        excluded = {"AERION_WORKSPACE_PATH", "AERION_REPORTS_PATH", "AERION_MEMORY_PATH"}
+        environment = {key: value for key, value in os.environ.items() if key not in excluded}
+        snapshot = ConfigurationResolver(Path.cwd()).resolve(environment=environment)
+        values = {item.key: item.value for item in snapshot.settings}
+        settings = cls(
+            log_level=str(values["logging.level"]),
+            ollama_model=str(values["core.ollama_model"]),
+            ollama_base_url=str(values["core.ollama_base_url"]),
+            command_timeout_seconds=int(values["core.command_timeout"]),
+            index_max_hash_bytes=int(values["indexing.max_file_size"]),
+            index_hash_chunk_bytes=int(values["indexing.chunk_size"]),
+            index_max_files=int(values["indexing.max_files"]),
+            graph_max_nodes=int(values["knowledge_graph.max_nodes"]),
+            graph_max_edges=int(values["knowledge_graph.max_edges"]),
+            graph_max_module_depth=int(values["knowledge_graph.max_module_depth"]),
+            graph_include_directory_nodes=bool(values["knowledge_graph.include_directory_nodes"]),
+            capability_registry_enabled=bool(values["capabilities.registry_enabled"]),
+            capability_disabled_ids=",".join(values["capabilities.disabled_ids"]),
+            capability_include_planned=bool(values["capabilities.include_planned"]),
+            capability_strict_validation=bool(values["capabilities.strict_validation"]),
+            capability_history_limit=int(values["capabilities.history_limit"]),
+            allow_shell=bool(values["security.allow_shell"]),
+            allow_docker=bool(values["security.allow_docker"]),
+            allow_database=bool(values["security.allow_database"]),
+            _env_file=None,  # type: ignore[call-arg]
+        )
+        canonical_paths: dict[str, Path] = {}
+        if "FORGE_WORKSPACE_STORE_PATH" in os.environ:
+            canonical_paths["workspace_path"] = Path(str(values["workspace.store_path"])).parent
+        if "FORGE_REPORTING_OUTPUT_DIRECTORY" in os.environ:
+            canonical_paths["reports_path"] = Path(str(values["reporting.output_directory"]))
+        if "FORGE_PERSISTENCE_MEMORY_DIRECTORY" in os.environ:
+            canonical_paths["memory_path"] = Path(str(values["persistence.memory_directory"]))
+        return settings.model_copy(update=canonical_paths)
 
     def ensure_runtime_directories(self) -> None:
         """Create directories owned by the agent, never the target repository."""

@@ -32,6 +32,7 @@ from forge.capabilities.models import (
     CapabilityRegistryResult,
 )
 from forge.config import Settings
+from forge.configuration.cli import config_app
 from forge.core import LoggingManager
 from forge.discovery import DiscoveryError, DiscoveryService
 from forge.indexing import (
@@ -68,6 +69,7 @@ app = typer.Typer(
 )
 console = Console()
 app.add_typer(workspace_app, name="workspace")
+app.add_typer(config_app, name="config")
 
 
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
@@ -123,13 +125,17 @@ def _print_capability_detail(
 
 def _settings(repository: Path | None = None, reports: Path | None = None) -> Settings:
     if repository is not None and reports is not None:
-        settings = Settings(repository_path=repository, reports_path=reports)
+        settings = Settings.from_runtime().model_copy(
+            update={"repository_path": repository.resolve(), "reports_path": reports.resolve()}
+        )
     elif repository is not None:
-        settings = Settings(repository_path=repository)
+        settings = Settings.from_runtime().model_copy(
+            update={"repository_path": repository.resolve()}
+        )
     elif reports is not None:
-        settings = Settings(reports_path=reports)
+        settings = Settings.from_runtime().model_copy(update={"reports_path": reports.resolve()})
     else:
-        settings = Settings()
+        settings = Settings.from_runtime()
     settings.ensure_runtime_directories()
     return settings
 

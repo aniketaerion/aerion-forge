@@ -52,6 +52,9 @@ Future planners and execution controllers may consult this registry. Mission pla
 test generation, ERP analysis, dynamic plugins, networks, and capability execution remain out of
 scope.
 
+Milestone 1.6 promotes `runtime-configuration` to stable, implemented, and available. Totals are six
+implemented/available and 25 planned/unavailable; diagnostics and release validation remain planned.
+
 ## Errors And Contract Stability
 
 Explicit exception types cover definition, dependency, cycle, configuration, validation,

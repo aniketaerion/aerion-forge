@@ -315,16 +315,33 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
             scope=Scope.GLOBAL,
             docs=("docs/CAPABILITIES.md",),
         ),
-    )
-    specs = (
-        (
+        _completed(
             "runtime-configuration",
             "Runtime Configuration",
+            "Resolves typed Forge runtime settings with deterministic provenance.",
             "1.6",
             Category.CONFIGURATION,
-            Access.READ_ONLY,
-            Approval.NONE,
+            outputs=(
+                _output("configuration-state", OutputType.JSON_REPORT, "memory/configuration.json"),
+                _output(
+                    "configuration-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/CONFIGURATION_EFFECTIVE.json",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge config",
+                    description="Inspect and validate runtime configuration.",
+                    primary=True,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=("docs/CONFIGURATION.md", "docs/contracts/RUNTIME_CONFIGURATION_CONTRACT.md"),
+            limitations=("Configuration is local and requires restart after applicable changes.",),
         ),
+    )
+    specs = (
         (
             "runtime-health-diagnostics",
             "Runtime Health Diagnostics",

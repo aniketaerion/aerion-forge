@@ -20,7 +20,7 @@ console = Console()
 
 
 def _manager() -> WorkspaceManager:
-    settings = Settings()
+    settings = Settings.from_runtime()
     settings.ensure_runtime_directories()
     logger = LoggingManager(settings.logs_path, settings.log_level).configure()
     return WorkspaceManager(JsonMemoryStore(settings.memory_path / "workspaces.json"), logger)
