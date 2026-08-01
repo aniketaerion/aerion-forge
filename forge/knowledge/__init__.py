@@ -1,0 +1,71 @@
+"""Structural engineering knowledge graph public API."""
+
+from forge.knowledge.errors import (
+    KnowledgeGraphBuildError,
+    KnowledgeGraphCorruptionError,
+    KnowledgeGraphError,
+    KnowledgeGraphInputMismatchError,
+    KnowledgeGraphInputMissingError,
+    KnowledgeGraphLimitExceededError,
+    KnowledgeGraphPersistenceError,
+    KnowledgeGraphReportError,
+    KnowledgeGraphTargetNotFoundError,
+    KnowledgeGraphValidationError,
+)
+from forge.knowledge.models import (
+    Confidence,
+    EvidenceOrigin,
+    GraphChangeType,
+    GraphValidationResult,
+    KnowledgeEdge,
+    KnowledgeEdgeType,
+    KnowledgeGraph,
+    KnowledgeGraphChange,
+    KnowledgeGraphChangeSet,
+    KnowledgeGraphConfiguration,
+    KnowledgeGraphGeneration,
+    KnowledgeGraphResult,
+    KnowledgeGraphStatistics,
+    KnowledgeGraphStore,
+    KnowledgeNode,
+    KnowledgeNodeType,
+    KnowledgeOrphans,
+)
+from forge.knowledge.query import KnowledgeGraphQuery
+from forge.knowledge.service import KnowledgeGraphService
+from forge.knowledge.store import KnowledgeGraphRepository
+from forge.knowledge.validator import KnowledgeGraphValidator
+
+__all__ = [
+    "Confidence",
+    "EvidenceOrigin",
+    "GraphChangeType",
+    "GraphValidationResult",
+    "KnowledgeEdge",
+    "KnowledgeEdgeType",
+    "KnowledgeGraph",
+    "KnowledgeGraphBuildError",
+    "KnowledgeGraphChange",
+    "KnowledgeGraphChangeSet",
+    "KnowledgeGraphConfiguration",
+    "KnowledgeGraphCorruptionError",
+    "KnowledgeGraphError",
+    "KnowledgeGraphGeneration",
+    "KnowledgeGraphInputMismatchError",
+    "KnowledgeGraphInputMissingError",
+    "KnowledgeGraphLimitExceededError",
+    "KnowledgeGraphPersistenceError",
+    "KnowledgeGraphQuery",
+    "KnowledgeGraphReportError",
+    "KnowledgeGraphRepository",
+    "KnowledgeGraphResult",
+    "KnowledgeGraphService",
+    "KnowledgeGraphStatistics",
+    "KnowledgeGraphStore",
+    "KnowledgeGraphTargetNotFoundError",
+    "KnowledgeGraphValidationError",
+    "KnowledgeGraphValidator",
+    "KnowledgeNode",
+    "KnowledgeNodeType",
+    "KnowledgeOrphans",
+]

@@ -1,0 +1,127 @@
+{
+  "project": "aerion-erp-agent",
+  "nodes": [
+    {
+      "name": "gitpython>=3.1.43,<4",
+      "version": "gitpython>=3.1.43,<4",
+      "scope": "runtime",
+      "source": "pyproject.toml"
+    },
+    {
+      "name": "pydantic>=2.7,<3",
+      "version": "pydantic>=2.7,<3",
+      "scope": "runtime",
+      "source": "pyproject.toml"
+    },
+    {
+      "name": "pydantic-settings>=2.2,<3",
+      "version": "pydantic-settings>=2.2,<3",
+      "scope": "runtime",
+      "source": "pyproject.toml"
+    },
+    {
+      "name": "rich>=13.7,<15",
+      "version": "rich>=13.7,<15",
+      "scope": "runtime",
+      "source": "pyproject.toml"
+    },
+    {
+      "name": "typer>=0.12,<1",
+      "version": "typer>=0.12,<1",
+      "scope": "runtime",
+      "source": "pyproject.toml"
+    },
+    {
+      "name": "watchdog>=4,<7",
+      "version": "watchdog>=4,<7",
+      "scope": "runtime",
+      "source": "pyproject.toml"
+    },
+    {
+      "name": "gitpython",
+      "version": "gitpython>=3.1.43,<4",
+      "scope": "runtime",
+      "source": "requirements.txt"
+    },
+    {
+      "name": "pydantic",
+      "version": "pydantic>=2.7,<3",
+      "scope": "runtime",
+      "source": "requirements.txt"
+    },
+    {
+      "name": "pydantic-settings",
+      "version": "pydantic-settings>=2.2,<3",
+      "scope": "runtime",
+      "source": "requirements.txt"
+    },
+    {
+      "name": "rich",
+      "version": "rich>=13.7,<15",
+      "scope": "runtime",
+      "source": "requirements.txt"
+    },
+    {
+      "name": "typer",
+      "version": "typer>=0.12,<1",
+      "scope": "runtime",
+      "source": "requirements.txt"
+    },
+    {
+      "name": "watchdog",
+      "version": "watchdog>=4,<7",
+      "scope": "runtime",
+      "source": "requirements.txt"
+    }
+  ],
+  "edges": [
+    [
+      "aerion-erp-agent",
+      "gitpython>=3.1.43,<4"
+    ],
+    [
+      "aerion-erp-agent",
+      "pydantic>=2.7,<3"
+    ],
+    [
+      "aerion-erp-agent",
+      "pydantic-settings>=2.2,<3"
+    ],
+    [
+      "aerion-erp-agent",
+      "rich>=13.7,<15"
+    ],
+    [
+      "aerion-erp-agent",
+      "typer>=0.12,<1"
+    ],
+    [
+      "aerion-erp-agent",
+      "watchdog>=4,<7"
+    ],
+    [
+      "aerion-erp-agent",
+      "gitpython"
+    ],
+    [
+      "aerion-erp-agent",
+      "pydantic"
+    ],
+    [
+      "aerion-erp-agent",
+      "pydantic-settings"
+    ],
+    [
+      "aerion-erp-agent",
+      "rich"
+    ],
+    [
+      "aerion-erp-agent",
+      "typer"
+    ],
+    [
+      "aerion-erp-agent",
+      "watchdog"
+    ]
+  ]
+}

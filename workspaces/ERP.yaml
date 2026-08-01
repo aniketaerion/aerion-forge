@@ -1,0 +1,4 @@
+name: ERP
+kind: enterprise-resource-planning
+root: null
+plugins: [ERP]

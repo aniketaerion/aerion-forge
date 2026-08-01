@@ -1,0 +1,4 @@
+name: PX4
+kind: autopilot
+root: null
+plugins: [PX4]

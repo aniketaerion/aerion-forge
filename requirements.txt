@@ -1,0 +1,6 @@
+gitpython>=3.1.43,<4
+pydantic>=2.7,<3
+pydantic-settings>=2.2,<3
+rich>=13.7,<15
+typer>=0.12,<1
+watchdog>=4,<7

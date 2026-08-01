@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aerion-forge"
+version = "0.2.0"
+description = "Multi-workspace local engineering platform"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "gitpython>=3.1.43,<4",
+  "pydantic>=2.7,<3",
+  "pydantic-settings>=2.2,<3",
+  "rich>=13.7,<15",
+  "typer>=0.12,<1",
+  "watchdog>=4,<7",
+]
+
+[project.optional-dependencies]
+dev = ["mypy>=1.10,<2", "pytest>=8,<9", "pytest-cov>=5,<8", "ruff>=0.5,<1"]
+
+[project.scripts]
+forge = "forge.cli:app"
+aerion-agent = "forge.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["forge*"]
+
+[tool.setuptools.package-data]
+forge = ["prompts/*.txt", "plugins/*/plugin.yaml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["forge"]

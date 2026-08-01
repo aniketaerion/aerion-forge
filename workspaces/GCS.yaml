@@ -1,0 +1,4 @@
+name: GCS
+kind: ground-control-station
+root: null
+plugins: [GCS]

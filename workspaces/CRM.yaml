@@ -1,0 +1,4 @@
+name: CRM
+kind: customer-relationship-management
+root: null
+plugins: [CRM]

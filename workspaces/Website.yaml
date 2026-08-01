@@ -1,0 +1,4 @@
+name: Website
+kind: web-application
+root: null
+plugins: [Website]

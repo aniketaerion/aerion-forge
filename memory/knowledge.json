@@ -1,0 +1,228 @@
+﻿{
+    "known_issues":  [
+                         {
+                             "category":  "TODO",
+                             "severity":  "medium",
+                             "message":  "patterns = [(re.compile(r\"\\bTODO\\b\", re.I), \"TODO\", \"medium\"), (re.compile(r\"\\bFIXME\\b\", re.I), \"FIXME\", \"high\"), (re.compile(r\"\\bNotImplemented(Error)?\\b|raise\\s+NotImplementedError|^\\s*pass\\s*(#.*)?$\"), \"Incomplete module\", \"high\")]",
+                             "path":  "aerion_agent/utils/repository.py",
+                             "line":  166
+                         },
+                         {
+                             "category":  "FIXME",
+                             "severity":  "high",
+                             "message":  "patterns = [(re.compile(r\"\\bTODO\\b\", re.I), \"TODO\", \"medium\"), (re.compile(r\"\\bFIXME\\b\", re.I), \"FIXME\", \"high\"), (re.compile(r\"\\bNotImplemented(Error)?\\b|raise\\s+NotImplementedError|^\\s*pass\\s*(#.*)?$\"), \"Incomplete module\", \"high\")]",
+                             "path":  "aerion_agent/utils/repository.py",
+                             "line":  166
+                         },
+                         {
+                             "category":  "Incomplete module",
+                             "severity":  "high",
+                             "message":  "patterns = [(re.compile(r\"\\bTODO\\b\", re.I), \"TODO\", \"medium\"), (re.compile(r\"\\bFIXME\\b\", re.I), \"FIXME\", \"high\"), (re.compile(r\"\\bNotImplemented(Error)?\\b|raise\\s+NotImplementedError|^\\s*pass\\s*(#.*)?$\"), \"Incomplete module\", \"high\")]",
+                             "path":  "aerion_agent/utils/repository.py",
+                             "line":  166
+                         },
+                         {
+                             "category":  "TODO",
+                             "severity":  "medium",
+                             "message":  "- Read-only technology, architecture, dependency, API, route, migration, CI, TODO/FIXME, incomplete-code, and test-gap detection",
+                             "path":  "README.md",
+                             "line":  12
+                         },
+                         {
+                             "category":  "FIXME",
+                             "severity":  "high",
+                             "message":  "- Read-only technology, architecture, dependency, API, route, migration, CI, TODO/FIXME, incomplete-code, and test-gap detection",
+                             "path":  "README.md",
+                             "line":  12
+                         },
+                         {
+                             "category":  "TODO",
+                             "severity":  "medium",
+                             "message":  "(repository / \"app.py\").write_text(\"# TODO add tests\\n\", encoding=\"utf-8\")",
+                             "path":  "tests/test_audit.py",
+                             "line":  12
+                         },
+                         {
+                             "category":  "TODO",
+                             "severity":  "medium",
+                             "message":  "assert any(finding.category == \"TODO\" for finding in result.findings)",
+                             "path":  "tests/test_audit.py",
+                             "line":  35
+                         }
+                     ],
+    "architecture_map":  {
+                             "repository":  "D:\\ERP-app\\aerion-erp-agent",
+                             "backend":  [
+
+                                         ],
+                             "frontend":  [
+
+                                          ],
+                             "database_migrations":  [
+
+                                                     ],
+                             "apis":  [
+
+                                      ],
+                             "routes":  [
+
+                                        ]
+                         },
+    "dependency_graph":  {
+                             "project":  "aerion-erp-agent",
+                             "nodes":  [
+                                           {
+                                               "name":  "gitpython\u003e=3.1.43,\u003c4",
+                                               "version":  "gitpython\u003e=3.1.43,\u003c4",
+                                               "scope":  "runtime",
+                                               "source":  "pyproject.toml"
+                                           },
+                                           {
+                                               "name":  "pydantic\u003e=2.7,\u003c3",
+                                               "version":  "pydantic\u003e=2.7,\u003c3",
+                                               "scope":  "runtime",
+                                               "source":  "pyproject.toml"
+                                           },
+                                           {
+                                               "name":  "pydantic-settings\u003e=2.2,\u003c3",
+                                               "version":  "pydantic-settings\u003e=2.2,\u003c3",
+                                               "scope":  "runtime",
+                                               "source":  "pyproject.toml"
+                                           },
+                                           {
+                                               "name":  "rich\u003e=13.7,\u003c15",
+                                               "version":  "rich\u003e=13.7,\u003c15",
+                                               "scope":  "runtime",
+                                               "source":  "pyproject.toml"
+                                           },
+                                           {
+                                               "name":  "typer\u003e=0.12,\u003c1",
+                                               "version":  "typer\u003e=0.12,\u003c1",
+                                               "scope":  "runtime",
+                                               "source":  "pyproject.toml"
+                                           },
+                                           {
+                                               "name":  "watchdog\u003e=4,\u003c7",
+                                               "version":  "watchdog\u003e=4,\u003c7",
+                                               "scope":  "runtime",
+                                               "source":  "pyproject.toml"
+                                           },
+                                           {
+                                               "name":  "gitpython",
+                                               "version":  "gitpython\u003e=3.1.43,\u003c4",
+                                               "scope":  "runtime",
+                                               "source":  "requirements.txt"
+                                           },
+                                           {
+                                               "name":  "pydantic",
+                                               "version":  "pydantic\u003e=2.7,\u003c3",
+                                               "scope":  "runtime",
+                                               "source":  "requirements.txt"
+                                           },
+                                           {
+                                               "name":  "pydantic-settings",
+                                               "version":  "pydantic-settings\u003e=2.2,\u003c3",
+                                               "scope":  "runtime",
+                                               "source":  "requirements.txt"
+                                           },
+                                           {
+                                               "name":  "rich",
+                                               "version":  "rich\u003e=13.7,\u003c15",
+                                               "scope":  "runtime",
+                                               "source":  "requirements.txt"
+                                           },
+                                           {
+                                               "name":  "typer",
+                                               "version":  "typer\u003e=0.12,\u003c1",
+                                               "scope":  "runtime",
+                                               "source":  "requirements.txt"
+                                           },
+                                           {
+                                               "name":  "watchdog",
+                                               "version":  "watchdog\u003e=4,\u003c7",
+                                               "scope":  "runtime",
+                                               "source":  "requirements.txt"
+                                           }
+                                       ],
+                             "edges":  [
+                                           [
+                                               "aerion-erp-agent",
+                                               "gitpython\u003e=3.1.43,\u003c4"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "pydantic\u003e=2.7,\u003c3"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "pydantic-settings\u003e=2.2,\u003c3"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "rich\u003e=13.7,\u003c15"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "typer\u003e=0.12,\u003c1"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "watchdog\u003e=4,\u003c7"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "gitpython"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "pydantic"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "pydantic-settings"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "rich"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "typer"
+                                           ],
+                                           [
+                                               "aerion-erp-agent",
+                                               "watchdog"
+                                           ]
+                                       ]
+                         },
+    "project_metadata":  {
+                             "repository":  "D:\\ERP-app\\aerion-erp-agent",
+                             "technologies":  [
+                                                  "Python"
+                                              ],
+                             "languages":  {
+                                               "Python":  35
+                                           },
+                             "file_count":  50,
+                             "last_audited_at":  "2026-08-01T02:25:40.650258+00:00"
+                         },
+    "completed_tasks":  [
+                            {
+                                "task":  "repository_audit",
+                                "completed_at":  "2026-08-01T02:25:40.650258+00:00",
+                                "repository":  "D:\\ERP-app\\aerion-erp-agent"
+                            }
+                        ],
+    "execution_history":  [
+                              {
+                                  "timestamp":  "2026-08-01T02:25:40.698381+00:00",
+                                  "action":  "repository_audit",
+                                  "status":  "completed",
+                                  "details":  {
+                                                  "repository":  "D:\\ERP-app\\aerion-erp-agent",
+                                                  "files":  50,
+                                                  "findings":  7
+                                              }
+                              }
+                          ]
+}
