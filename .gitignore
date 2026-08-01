@@ -14,6 +14,7 @@ memory/sessions/*
 !memory/sessions/.gitkeep
 reports/latest/*
 !reports/latest/.gitkeep
+!reports/latest/PHASE_1_RELEASE_MANIFEST.json
 dist/
 build/
 *.egg-info/

@@ -1,0 +1,150 @@
+{
+  "baseline_commit": "7e3879d",
+  "baseline_tag": "forge-v0.2-m1.7",
+  "cli_command_families": [
+    "capabilities",
+    "capability",
+    "config",
+    "diagnose",
+    "graph",
+    "health",
+    "index",
+    "inspect",
+    "workspace"
+  ],
+  "compatibility_status": "passed",
+  "determinism_status": "passed",
+  "frozen_contracts": [
+    "capability-registry",
+    "diagnostics",
+    "discovery",
+    "indexing",
+    "knowledge-graph",
+    "repository-policy",
+    "runtime-configuration",
+    "workspace"
+  ],
+  "implemented_capability_ids": [
+    "capability-registry",
+    "engineering-knowledge-graph",
+    "incremental-project-index",
+    "phase-validation-release",
+    "repository-discovery",
+    "runtime-configuration",
+    "runtime-health-diagnostics",
+    "workspace-management"
+  ],
+  "milestone": "1.8",
+  "persistence_files": [
+    "memory/workspaces.json",
+    "memory/discovery.json",
+    "memory/index.json",
+    "memory/knowledge_graph.json",
+    "memory/capabilities.json",
+    "memory/configuration.json",
+    "memory/diagnostics.json"
+  ],
+  "phase": "1",
+  "planned_capability_ids": [
+    "api-contract-analysis",
+    "automated-test-generation",
+    "backend-analysis",
+    "build-verification",
+    "database-migration-analysis",
+    "documentation-generation",
+    "engineering-memory",
+    "erp-knowledge-model",
+    "erp-mission-execution",
+    "erp-module-analysis",
+    "erp-workflow-analysis",
+    "error-recovery",
+    "execution-controller",
+    "frontend-analysis",
+    "git-review-package",
+    "human-approval-workflow",
+    "impact-decision-engine",
+    "mission-planning",
+    "mission-reporting",
+    "regression-validation",
+    "safe-change-planning",
+    "safe-code-editing",
+    "task-management"
+  ],
+  "product": "Aerion Forge",
+  "recommended_commit": "release: complete Aerion Forge v0.2 engineering runtime",
+  "recommended_tag": "forge-v0.2.0",
+  "release_commit": "pending",
+  "release_decision": "conditional_pass",
+  "release_name": "Engineering Runtime",
+  "report_families": [
+    "capabilities",
+    "configuration",
+    "diagnostics",
+    "discovery",
+    "index",
+    "knowledge_graph",
+    "release"
+  ],
+  "schema_version": "1.0",
+  "schemas": [
+    {
+      "compatibility_policy": "Additive fields only within v0.2; migration required for breaking changes.",
+      "persistence_file": "memory/workspaces.json",
+      "primary_models": ["Workspace", "ProjectType"],
+      "schema_version": "legacy-1.0",
+      "subsystem": "workspace"
+    },
+    {
+      "compatibility_policy": "Additive fields only within v0.2; migration required for breaking changes.",
+      "persistence_file": "memory/discovery.json",
+      "primary_models": ["DiscoveryResult"],
+      "schema_version": "legacy-1.0",
+      "subsystem": "discovery"
+    },
+    {
+      "compatibility_policy": "Schema mismatch is explicit; breaking changes require migration.",
+      "persistence_file": "memory/index.json",
+      "primary_models": ["IndexStore", "ProjectIndex", "IndexGeneration"],
+      "schema_version": "1.0",
+      "subsystem": "index"
+    },
+    {
+      "compatibility_policy": "Schema mismatch is explicit; breaking changes require migration.",
+      "persistence_file": "memory/knowledge_graph.json",
+      "primary_models": ["KnowledgeGraphStore", "KnowledgeGraph", "KnowledgeGraphGeneration"],
+      "schema_version": "1.0",
+      "subsystem": "knowledge_graph"
+    },
+    {
+      "compatibility_policy": "Schema mismatch is explicit; breaking changes require migration.",
+      "persistence_file": "memory/capabilities.json",
+      "primary_models": ["CapabilityRegistryStore", "CapabilityRegistry"],
+      "schema_version": "1.0",
+      "subsystem": "capabilities"
+    },
+    {
+      "compatibility_policy": "Schema mismatch is explicit; breaking changes require migration.",
+      "persistence_file": "memory/configuration.json",
+      "primary_models": ["ConfigurationStore", "ConfigurationSnapshot"],
+      "schema_version": "1.0",
+      "subsystem": "configuration"
+    },
+    {
+      "compatibility_policy": "Schema mismatch is explicit; breaking changes require migration.",
+      "persistence_file": "memory/diagnostics.json",
+      "primary_models": ["DiagnosticStore", "DiagnosticSnapshot"],
+      "schema_version": "1.0",
+      "subsystem": "diagnostics"
+    }
+  ],
+  "security_status": "passed",
+  "source_file_count": 137,
+  "test_count": 151,
+  "validation": {
+    "git_diff_check": "passed",
+    "mypy": "passed",
+    "pytest": "passed",
+    "ruff": "passed"
+  },
+  "version": "0.2.0"
+}

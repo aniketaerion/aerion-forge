@@ -27,4 +27,4 @@ Safe state is atomically stored at `memory/configuration.json`; six deterministi
 Use `forge config show`, `get`, `explain`, `validate`, `profiles`, and `fingerprint`. The immutable
 `ConfigurationQuery` provides typed lookup and filtering. Existing `AERION_` variables remain
 aliases; canonical `FORGE_` variables win. `Settings` remains the compatibility facade. Runtime
-health diagnostics and live reload remain Milestone 1.7 scope.
+Live reload remains deferred; runtime health diagnostics are implemented in Phase 1.

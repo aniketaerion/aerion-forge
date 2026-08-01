@@ -1,14 +1,25 @@
 ﻿# Aerion Forge
 
-Milestone 1.7 adds deterministic local runtime health and target-readiness diagnostics. Use
-`forge health` and `forge diagnose [TARGET]`; see `docs/DIAGNOSTICS.md`.
+Aerion Forge v0.2 is the Phase 1 Engineering Runtime: a local deterministic platform for
+workspace management, repository discovery, incremental indexing, structural knowledge graphs,
+capability/configuration inspection, and operational diagnostics.
 
-Aerion Forge Version 0.2 is a local, multi-workspace engineering platform. Its
+Use `forge workspace`, `forge inspect`, `forge index`, `forge graph`, `forge capabilities`,
+`forge config validate`, `forge health`, and `forge diagnose [TARGET]`. Forge v0.2 does not plan
+missions, edit code, execute builds or target tests, perform ERP intelligence, or remediate state.
+
+Its
 deterministic Capability Registry truthfully declares completed and planned functionality. Run
 `forge capabilities` or `forge capability capability-registry`; see `docs/CAPABILITIES.md`.
 The schema contract and hardening evidence are in `docs/contracts/` and `docs/audits/`.
 Milestone 1.6 adds unified runtime configuration; run `forge config show` and see
 `docs/CONFIGURATION.md`.
+
+Supported families include ERP, CRM, websites, React/Node, Flutter, GCS, PX4, ROS2,
+firmware/embedded, Python, C/C++, Rust, Go, and Java shapes. The Phase 1 contract and release
+evidence are in `docs/contracts/PHASE_1_ENGINEERING_RUNTIME_CONTRACT.md`,
+`docs/audits/PHASE_1_RELEASE_VALIDATION.md`, and the v0.2 release notes. Formal release
+administration remains pending an authorized commit and `forge-v0.2.0` tag.
 
 ## Installation
 
@@ -84,6 +95,7 @@ forge/
     scanner.py            Manifest-first repository inspection
     service.py            Persistence and atomic report writing
   workspace/              Workspace Manager and CLI
+  release/                Deterministic Phase 1 release manifest contracts
   agents/                 Version 0.1 repository audit
   config/ core/ memory/ models/ planner/ reports/ tools/ utils/
   runtime/ plugins/ prompts/

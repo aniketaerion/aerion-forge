@@ -8,6 +8,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from forge.config import Settings
 from forge.configuration.errors import (
     ConfigurationError,
     ConfigurationFileNotFoundError,
@@ -34,10 +35,11 @@ console = Console()
 
 
 def _service() -> ConfigurationService:
+    settings = Settings.from_runtime()
     return ConfigurationService(
         Path.cwd(),
-        Path("memory"),
-        Path("reports/latest"),
+        settings.memory_path,
+        settings.reports_path,
     )
 
 

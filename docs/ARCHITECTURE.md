@@ -1,6 +1,6 @@
 ﻿# Aerion Forge Architecture
 
-Version 0.2 Milestone 1.7 preserves all existing subsystem boundaries.
+Version 0.2 Phase 1 freezes the Engineering Runtime subsystem boundaries.
 
 ## Runtime readiness
 
@@ -17,6 +17,10 @@ Readiness Evidence for Future Planning
 Diagnostics consumes safe Workspace, Discovery, Index, Knowledge Graph, Capability, and
 Configuration stores plus report paths and shared repository policy. It does not regenerate or
 repair state and never executes target code. Phase 2 may consume readiness later.
+
+The frozen contract, schema inventory, legacy-scaffolding boundary, and compatibility policy are
+defined in `contracts/PHASE_1_ENGINEERING_RUNTIME_CONTRACT.md`. Phase validation creates release
+evidence but performs no Git, packaging, publishing, or deployment automation.
 
 ```text
 Workspace Manager -> Repository Discovery -> Incremental Project Index

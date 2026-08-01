@@ -23,7 +23,6 @@ class DiscoveryRenderer:
             key: data[key]
             for key in (
                 "repository_name",
-                "repository_root",
                 "project_type",
                 "repository_size_bytes",
                 "file_count",
@@ -77,7 +76,6 @@ class DiscoveryRenderer:
         return f"""# Project Summary
 
 - Repository: `{result.repository_name}`
-- Root: `{result.repository_root}`
 - Project type: {result.project_type}
 - Files: {result.file_count}
 - Directories: {result.directory_count}

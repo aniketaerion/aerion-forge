@@ -379,16 +379,52 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
             docs=("docs/DIAGNOSTICS.md", "docs/contracts/RUNTIME_DIAGNOSTICS_CONTRACT.md"),
             limitations=("Local, on-demand, read-only diagnosis; no automatic remediation.",),
         ),
-    )
-    specs = (
-        (
+        _completed(
             "phase-validation-release",
             "Phase Validation Release",
+            "Validates and freezes the Phase 1 Engineering Runtime release contracts.",
             "1.8",
             Category.VERIFICATION,
-            Access.FORGE_INTERNAL_WRITE,
-            Approval.NONE,
+            requires=(
+                "workspace-management",
+                "repository-discovery",
+                "incremental-project-index",
+                "engineering-knowledge-graph",
+                "capability-registry",
+                "runtime-configuration",
+                "runtime-health-diagnostics",
+            ),
+            inputs=(
+                _input("configuration", InputType.CONFIGURATION),
+                _input("workspace-state", InputType.WORKSPACE_STATE),
+                _input("discovery-state", InputType.DISCOVERY_STATE),
+                _input("index-state", InputType.INDEX_STATE),
+                _input("knowledge-graph-state", InputType.KNOWLEDGE_GRAPH_STATE),
+            ),
+            outputs=(
+                _output(
+                    "phase-release-manifest",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/PHASE_1_RELEASE_MANIFEST.json",
+                ),
+                _output(
+                    "phase-release-validation",
+                    OutputType.MARKDOWN_REPORT,
+                    "docs/audits/PHASE_1_RELEASE_VALIDATION.md",
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/audits/PHASE_1_RELEASE_VALIDATION.md",
+                "docs/contracts/PHASE_1_ENGINEERING_RUNTIME_CONTRACT.md",
+                "docs/releases/AERION_FORGE_V0_2_RELEASE_NOTES.md",
+            ),
+            limitations=(
+                "Produces release evidence only; it does not commit, tag, push, or publish.",
+            ),
         ),
+    )
+    specs = (
         (
             "mission-planning",
             "Mission Planning",

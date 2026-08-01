@@ -1,5 +1,16 @@
 ﻿# Changelog
 
+## Version 0.2.0 - Phase 1 Engineering Runtime
+
+- Completed and froze Workspace Manager, Repository Discovery, Incremental Project Index,
+  Engineering Knowledge Graph, Capability Registry, Runtime Configuration, and Runtime Health &
+  Diagnostics contracts.
+- Added deterministic release validation, schema/persistence/report/CLI inventories,
+  architecture contract, release notes, manifest, integration tests, and security evidence.
+- Promoted `phase-validation-release`: 8 of 31 capabilities are available and 23 remain planned.
+- Confirmed target-read-only understanding, secret protection, deterministic artifacts, and no
+  Phase 2 planning, editing, execution, ERP intelligence, monitoring, or remediation.
+
 ## Version 0.2 - Milestone 1.7
 
 - Added typed runtime health and target readiness with a static 30-check catalogue.
