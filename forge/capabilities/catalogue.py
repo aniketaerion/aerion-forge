@@ -872,16 +872,142 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
                 "tags": ("phase-2",),
             }
         ),
-    )
-    specs = (
-        (
+        _completed(
             "execution-controller",
             "Execution Controller",
+            (
+                "Creates deterministic execution requests and sessions, "
+                "enforces explicit approval and state transitions, validates "
+                "operation scope, and produces auditable execution evidence."
+            ),
             "3.1",
             Category.EXECUTION,
-            Access.TARGET_MUTATING,
-            Approval.ALWAYS_REQUIRED,
+            requires=(
+                "mission-planning",
+                "task-management",
+                "impact-decision-engine",
+                "engineering-memory",
+                "mission-reporting",
+            ),
+            inputs=(
+                _input(
+                    "mission-plan",
+                    InputType.UNKNOWN,
+                    producer="mission-planning",
+                ),
+                _input(
+                    "task-set",
+                    InputType.UNKNOWN,
+                    producer="task-management",
+                ),
+                _input(
+                    "impact-assessment",
+                    InputType.UNKNOWN,
+                    producer="impact-decision-engine",
+                ),
+                _input(
+                    "engineering-memory",
+                    InputType.UNKNOWN,
+                    producer="engineering-memory",
+                ),
+                _input(
+                    "mission-report",
+                    InputType.UNKNOWN,
+                    producer="mission-reporting",
+                ),
+                _input(
+                    "configuration",
+                    InputType.CONFIGURATION,
+                ),
+            ),
+            outputs=(
+                _output(
+                    "execution-request",
+                    OutputType.PLAN,
+                    "memory/execution-request.json",
+                ),
+                _output(
+                    "execution-session",
+                    OutputType.PLAN,
+                    "memory/execution-session.json",
+                ),
+                _output(
+                    "execution-controller-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/EXECUTION_CONTROLLER.json",
+                ),
+                _output(
+                    "execution-controller-summary",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/EXECUTION_CONTROLLER_SUMMARY.json",
+                ),
+                _output(
+                    "execution-controller-evidence",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/EXECUTION_CONTROLLER_EVIDENCE.json",
+                ),
+                _output(
+                    "execution-controller-transitions",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/EXECUTION_CONTROLLER_TRANSITIONS.json",
+                ),
+                _output(
+                    "execution-controller-markdown",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/EXECUTION_CONTROLLER.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge execution request",
+                    description=("Create a deterministic controlled execution request."),
+                    primary=True,
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge execution validate",
+                    description=("Validate the latest persisted execution request."),
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge execution show",
+                    description=("Show a persisted execution request or session."),
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge execution list",
+                    description=("List persisted Execution Controller artifacts."),
+                    requires_target=False,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/execution_controller/ARCHITECTURE.md",
+                "docs/execution_controller/SPECIFICATION.md",
+                "docs/execution_controller/STATE_MACHINE.md",
+                "docs/execution_controller/DATA_MODEL.md",
+                "docs/execution_controller/API_CONTRACT.md",
+                "docs/execution_controller/ERROR_MODEL.md",
+                "docs/execution_controller/TEST_PLAN.md",
+                "docs/execution_controller/ACCEPTANCE_CRITERIA.md",
+            ),
+            limitations=(
+                "Tool dispatch is disabled by default. The current milestone "
+                "does not autonomously edit source files, execute builds or "
+                "tests, mutate Git, deploy software, run migrations, grant "
+                "approval, or perform autonomous remediation.",
+            ),
+        ).model_copy(
+            update={
+                "forge_version": "0.3",
+                "phase": "3",
+                "access_mode": Access.FORGE_INTERNAL_WRITE,
+                "approval_policy": Approval.ALWAYS_REQUIRED,
+                "tags": ("phase-3",),
+            }
         ),
+    )
+    specs = (
         (
             "safe-change-planning",
             "Safe Change Planning",
