@@ -75,6 +75,7 @@ from forge.knowledge.validator import KnowledgeGraphValidator
 from forge.memory import JsonMemoryStore
 from forge.mission_reporting.cli import report_app
 from forge.planning.cli import mission_app
+from forge.safe_change_planning.cli import safe_change_app
 from forge.tasks.cli import task_app
 from forge.tools import FilesystemTool, GitTool, OllamaTool
 from forge.workspace.cli import workspace_app
@@ -95,6 +96,7 @@ app.add_typer(impact_app, name="impact")
 app.add_typer(memory_app, name="memory")
 app.add_typer(report_app, name="report")
 app.add_typer(execution_app, name="execution")
+app.add_typer(safe_change_app, name="safe-change")
 
 
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
