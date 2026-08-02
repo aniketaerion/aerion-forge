@@ -74,7 +74,8 @@ def test_catalogue_is_complete_unique_and_truthful() -> None:
         "runtime-health-diagnostics",
         "phase-validation-release",
         "mission-planning",
-    "task-management",
+        "task-management",
+        "impact-decision-engine",
     }
     assert completed <= set(ids)
     assert all(
@@ -129,7 +130,7 @@ def test_unknown_disabled_id_strict_and_non_strict() -> None:
     result = _build(
         CapabilityRegistryConfiguration(disabled_ids=("missing",), strict_validation=False)
     )
-    assert result.registry.statistics.available_capabilities == 10
+    assert result.registry.statistics.available_capabilities == 11
 
 
 def test_deterministic_build_and_query_api() -> None:
@@ -137,8 +138,8 @@ def test_deterministic_build_and_query_api() -> None:
     second = _build().registry
     assert first.generation == second.generation
     query = CapabilityRegistryQuery(first)
-    assert len(query.list_available_capabilities()) == 10
-    assert len(query.list_planned_capabilities()) == 21
+    assert len(query.list_available_capabilities()) == 11
+    assert len(query.list_planned_capabilities()) == 20
     assert query.get_capabilities_by_category(CapabilityCategory.KNOWLEDGE)
     assert query.get_capabilities_for_project_type("React")
     assert query.get_required_capabilities("engineering-knowledge-graph")

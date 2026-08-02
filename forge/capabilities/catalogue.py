@@ -575,16 +575,101 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
                 "tags": ("phase-2",),
             }
         ),
-    )
-    specs = (
-        (
+        _completed(
             "impact-decision-engine",
             "Impact Decision Engine",
+            (
+                "Produces deterministic engineering impact assessments "
+                "and controlled decision recommendations from persisted "
+                "Mission Plans and Task Sets."
+            ),
             "2.3",
             Category.PLANNING,
-            Access.READ_ONLY,
-            Approval.NONE,
+            requires=(
+                "mission-planning",
+                "task-management",
+            ),
+            inputs=(
+                _input(
+                    "mission-plan",
+                    InputType.UNKNOWN,
+                    producer="mission-planning",
+                ),
+                _input(
+                    "task-set",
+                    InputType.UNKNOWN,
+                    producer="task-management",
+                ),
+                _input(
+                    "configuration",
+                    InputType.CONFIGURATION,
+                ),
+            ),
+            outputs=(
+                _output(
+                    "impact-decision-store",
+                    OutputType.PLAN,
+                    "memory/impact-decisions.json",
+                ),
+                _output(
+                    "impact-assessment-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/IMPACT_ASSESSMENT.json",
+                ),
+                _output(
+                    "impact-decision-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/IMPACT_DECISION.json",
+                ),
+                _output(
+                    "impact-evidence-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/IMPACT_EVIDENCE.json",
+                ),
+                _output(
+                    "impact-summary-report",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/IMPACT_SUMMARY.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge impact assess",
+                    description=("Assess a persisted Mission Plan and Task Set."),
+                    primary=True,
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge impact list",
+                    description=("List persisted Impact Decision assessments."),
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge impact show",
+                    description=("Show one persisted Impact Decision assessment."),
+                    requires_target=False,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/IMPACT_DECISION.md",
+                "docs/contracts/IMPACT_DECISION_CONTRACT.md",
+            ),
+            limitations=(
+                "No task execution, source editing, build execution, "
+                "test execution, migration, Git mutation, deployment, "
+                "approval granting, or autonomous remediation.",
+            ),
+        ).model_copy(
+            update={
+                "forge_version": "0.3",
+                "phase": "2",
+                "access_mode": Access.FORGE_INTERNAL_WRITE,
+                "tags": ("phase-2",),
+            }
         ),
+    )
+    specs = (
         (
             "engineering-memory",
             "Engineering Memory",
