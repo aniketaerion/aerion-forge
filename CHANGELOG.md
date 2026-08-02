@@ -1,3 +1,47 @@
+## Aerion Forge v0.3 - Milestone 2.2
+
+### Added
+
+- Deterministic `forge.tasks` subsystem
+- Typed Task Management schema `1.0`
+- Mission Plan to Task Set decomposition
+- Parent-child task hierarchy
+- Deterministic dependency mapping
+- Task lifecycle and risk policies
+- Dependency-cycle and parent-cycle validation
+- Deterministic task and task-set fingerprints
+- Atomic `memory/tasks.json` persistence
+- Bounded task history and store restoration
+- Read-only Task Query API
+- Deterministic JSON and Markdown reports
+- Report-failure rollback
+- `forge task build`
+- `forge task list`
+- `forge task show`
+- Nine `tasks.*` configuration settings
+- Task Management documentation and contract
+
+### Changed
+
+- Promoted `task-management` to implemented, stable and available
+- Live capability inventory is now 10 implemented and 21 planned
+- Runtime configuration catalogue increased from 49 to 58 settings
+- Preserved the historical Phase 1 inventory at 8 implemented and 23 planned
+
+### Validation
+
+- Ruff passed
+- mypy passed across 174 source files
+- pytest: 244 passed
+- `git diff --check` passed
+
+### Safety
+
+Milestone 2.2 performs task planning and Forge-owned persistence only. It does
+not execute tasks, edit source code, run builds or tests, perform migrations,
+mutate Git, deploy software, schedule work, automatically assign owners or
+perform autonomous remediation.
+
 ## Aerion Forge v0.3 - Milestone 2.1
 
 ### Added

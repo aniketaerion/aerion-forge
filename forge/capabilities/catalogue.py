@@ -488,16 +488,95 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
                 "tags": ("phase-2",),
             }
         ),
-    )
-    specs = (
-        (
+        _completed(
             "task-management",
             "Task Management",
+            ("Creates deterministic engineering task graphs from persisted mission plans."),
             "2.2",
             Category.PLANNING,
-            Access.FORGE_INTERNAL_WRITE,
-            Approval.NONE,
+            requires=("mission-planning",),
+            inputs=(
+                _input(
+                    "mission-plan",
+                    InputType.UNKNOWN,
+                    producer="mission-planning",
+                ),
+                _input(
+                    "configuration",
+                    InputType.CONFIGURATION,
+                ),
+            ),
+            outputs=(
+                _output(
+                    "task-store",
+                    OutputType.PLAN,
+                    "memory/tasks.json",
+                ),
+                _output(
+                    "task-plan-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/TASK_PLAN.json",
+                ),
+                _output(
+                    "task-summary-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/TASK_SUMMARY.json",
+                ),
+                _output(
+                    "task-changes-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/TASK_CHANGES.json",
+                ),
+                _output(
+                    "task-plan-markdown",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/TASK_PLAN.md",
+                ),
+                _output(
+                    "task-summary-markdown",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/TASK_SUMMARY.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge task build",
+                    description=("Build tasks from a persisted mission plan."),
+                    primary=True,
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge task list",
+                    description="List persisted engineering tasks.",
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge task show",
+                    description="Show one persisted engineering task.",
+                    requires_target=False,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/TASK_MANAGEMENT.md",
+                "docs/contracts/TASK_MANAGEMENT_CONTRACT.md",
+            ),
+            limitations=(
+                "No task execution, scheduling, automatic assignment, "
+                "source editing, build execution, test execution, "
+                "migration, Git mutation, deployment, or autonomous "
+                "remediation.",
+            ),
+        ).model_copy(
+            update={
+                "forge_version": "0.3",
+                "phase": "2",
+                "access_mode": Access.FORGE_INTERNAL_WRITE,
+                "tags": ("phase-2",),
+            }
         ),
+    )
+    specs = (
         (
             "impact-decision-engine",
             "Impact Decision Engine",

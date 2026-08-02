@@ -47,3 +47,22 @@ Milestone 2.1 adds the `planning` namespace.
 
 The runtime configuration catalogue now contains 49 settings, including
 9 Mission Planning settings.
+
+## Task Management Settings
+
+Milestone 2.2 adds the `tasks` namespace.
+
+| Key | Type | Default | Constraint |
+|---|---|---:|---|
+| `tasks.enabled` | boolean | `true` | - |
+| `tasks.strict` | boolean | `false` | - |
+| `tasks.history_limit` | integer | `5` | 0-100 |
+| `tasks.max_tasks_per_mission` | integer | `250` | 1-5000 |
+| `tasks.max_dependencies_per_task` | integer | `25` | 0-250 |
+| `tasks.max_acceptance_criteria_per_task` | integer | `25` | 1-250 |
+| `tasks.max_validation_requirements_per_task` | integer | `25` | 1-250 |
+| `tasks.require_approved_mission` | boolean | `true` | - |
+| `tasks.allow_blocked_tasks` | boolean | `true` | - |
+
+The runtime configuration catalogue now contains 58 settings, including
+9 Task Management settings.

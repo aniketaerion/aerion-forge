@@ -58,6 +58,37 @@ class Settings(BaseSettings):
     planning_max_questions: int = Field(default=12, ge=1, le=100)
     planning_require_current_graph: bool = True
     planning_allow_degraded_runtime: bool = True
+
+    task_management_enabled: bool = True
+    task_management_strict: bool = False
+    task_management_history_limit: int = Field(
+        default=5,
+        ge=0,
+        le=100,
+    )
+    task_management_max_tasks_per_mission: int = Field(
+        default=250,
+        ge=1,
+        le=5000,
+    )
+    task_management_max_dependencies_per_task: int = Field(
+        default=25,
+        ge=0,
+        le=250,
+    )
+    task_management_max_acceptance_criteria_per_task: int = Field(
+        default=25,
+        ge=1,
+        le=250,
+    )
+    task_management_max_validation_requirements_per_task: int = Field(
+        default=25,
+        ge=1,
+        le=250,
+    )
+    task_management_require_approved_mission: bool = True
+    task_management_allow_blocked_tasks: bool = True
+
     allow_shell: bool = False
     allow_docker: bool = False
     allow_database: bool = False
@@ -155,6 +186,21 @@ class Settings(BaseSettings):
             planning_max_questions=int(values["planning.max_questions"]),
             planning_require_current_graph=bool(values["planning.require_current_graph"]),
             planning_allow_degraded_runtime=bool(values["planning.allow_degraded_runtime"]),
+            task_management_enabled=bool(values["tasks.enabled"]),
+            task_management_strict=bool(values["tasks.strict"]),
+            task_management_history_limit=int(values["tasks.history_limit"]),
+            task_management_max_tasks_per_mission=int(values["tasks.max_tasks_per_mission"]),
+            task_management_max_dependencies_per_task=int(
+                values["tasks.max_dependencies_per_task"]
+            ),
+            task_management_max_acceptance_criteria_per_task=int(
+                values["tasks.max_acceptance_criteria_per_task"]
+            ),
+            task_management_max_validation_requirements_per_task=int(
+                values["tasks.max_validation_requirements_per_task"]
+            ),
+            task_management_require_approved_mission=bool(values["tasks.require_approved_mission"]),
+            task_management_allow_blocked_tasks=bool(values["tasks.allow_blocked_tasks"]),
             allow_shell=bool(values["security.allow_shell"]),
             allow_docker=bool(values["security.allow_docker"]),
             allow_database=bool(values["security.allow_database"]),

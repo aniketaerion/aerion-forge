@@ -178,3 +178,52 @@ tests, perform migrations, mutate Git, deploy software, or remediate issues.
 The historical Phase 1 release manifest remains frozen at 8 implemented and
 23 planned capabilities. The live Milestone 2.1 registry contains 9 implemented
 and 22 planned capabilities.
+
+## Phase 2 Task Management Architecture
+
+Milestone 2.2 introduces the `forge.tasks` subsystem.
+
+### Components
+
+- `models.py` - immutable typed task contracts and controlled enums
+- `errors.py` - Task Management exception hierarchy
+- `identifiers.py` - deterministic task and task-set identities
+- `policies.py` - lifecycle transitions, risk ordering and milestone exclusions
+- `validator.py` - task-set, hierarchy, dependency and fingerprint validation
+- `decomposer.py` - deterministic Mission Plan to Task Set transformation
+- `store.py` - atomic persistence, snapshots, restoration and bounded history
+- `query.py` - immutable read-only task queries
+- `renderer.py` - deterministic JSON and Markdown reports
+- `service.py` - decomposition, validation, persistence, reporting and rollback
+- `cli.py` - `forge task build`, `forge task list` and `forge task show`
+
+### Data Flow
+
+    Persisted Mission Plan
+        -> mission lookup
+        -> deterministic decomposition
+        -> task hierarchy and dependency construction
+        -> validation
+        -> task-set fingerprinting
+        -> persistence
+        -> deterministic reports
+
+### Persistence Boundary
+
+Task Management writes only Forge-owned state and reports:
+
+- `memory/tasks.json`
+- `reports/latest/TASK_*.json`
+- `reports/latest/TASK_*.md`
+
+It does not mutate the target repository.
+
+### Safety Boundary
+
+Milestone 2.2 excludes task execution, scheduling, automatic assignment,
+source-code editing, target builds, target tests, migrations, Git mutation,
+deployment and autonomous remediation.
+
+The live Forge v0.3 catalogue contains 10 implemented capabilities and
+21 planned capabilities. The historical Phase 1 release manifest remains
+frozen at 8 implemented capabilities and 23 planned capabilities.

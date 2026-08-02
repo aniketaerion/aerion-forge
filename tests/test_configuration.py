@@ -26,7 +26,9 @@ from forge.configuration.store import ConfigurationRepository
 def test_definitions_are_canonical_complete_and_typed() -> None:
     definitions = setting_definitions()
     keys = [x.key for x in definitions]
-    assert len(definitions) == 49 and keys == sorted(keys) and len(keys) == len(set(keys))
+    assert len(definitions) == 58
+    assert keys == sorted(keys)
+    assert len(keys) == len(set(keys))
     assert {x.namespace for x in definitions} == {
         "core",
         "workspace",
@@ -41,6 +43,7 @@ def test_definitions_are_canonical_complete_and_typed() -> None:
         "cli",
         "diagnostics",
         "planning",
+        "tasks",
     }
 
 

@@ -71,6 +71,7 @@ from forge.knowledge import (
 from forge.knowledge.validator import KnowledgeGraphValidator
 from forge.memory import JsonMemoryStore
 from forge.planning.cli import mission_app
+from forge.tasks.cli import task_app
 from forge.tools import FilesystemTool, GitTool, OllamaTool
 from forge.workspace.cli import workspace_app
 from forge.workspace.errors import WorkspaceError, WorkspaceNotFoundError
@@ -85,6 +86,7 @@ console = Console()
 app.add_typer(workspace_app, name="workspace")
 app.add_typer(config_app, name="config")
 app.add_typer(mission_app, name="mission")
+app.add_typer(task_app, name="task")
 
 
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:

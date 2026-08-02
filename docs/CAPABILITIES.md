@@ -126,3 +126,42 @@ and 23 planned capabilities.
 
 Mission Planning performs no code editing, execution, build, test, migration,
 Git mutation, deployment, or remediation.
+
+## Task Management Capability
+
+- Capability ID: `task-management`
+- Forge version: `0.3`
+- Phase: `2`
+- Milestone: `2.2`
+- Lifecycle: `available`
+- Implementation: `implemented`
+- Maturity: `stable`
+- Access mode: `forge_internal_write`
+- Required capability: `mission-planning`
+
+Primary commands:
+
+    forge task build <mission-id>
+    forge task list
+    forge task show <task-id>
+
+Produced outputs:
+
+- `memory/tasks.json`
+- `reports/latest/TASK_PLAN.json`
+- `reports/latest/TASK_SUMMARY.json`
+- `reports/latest/TASK_CHANGES.json`
+- `reports/latest/TASK_PLAN.md`
+- `reports/latest/TASK_SUMMARY.md`
+
+Current live catalogue:
+
+- Total: 31
+- Implemented and available: 10
+- Planned and unavailable: 21
+
+The historical Forge v0.2 Phase 1 release inventory remains frozen at
+8 implemented capabilities and 23 planned capabilities.
+
+Task Management does not execute tasks, edit source code, run builds or tests,
+perform migrations, mutate Git, deploy software or remediate issues.

@@ -138,7 +138,7 @@ def test_phase1_end_to_end_is_read_only_and_deterministic(tmp_path: Path) -> Non
     assert query.get_result("discovery-index-consistent").status is HealthStatus.HEALTHY
     assert query.get_result("index-graph-consistent").status is HealthStatus.HEALTHY
     assert runtime_health.snapshot.summary.unhealthy_count == 0
-    assert capabilities.registry.statistics.available_capabilities == 9
+    assert capabilities.registry.statistics.available_capabilities == 10
     assert configuration.snapshot.validation.valid
     assert _snapshot(target) == before
     assert not any(path.name in {"memory", "reports"} for path in target.iterdir())
