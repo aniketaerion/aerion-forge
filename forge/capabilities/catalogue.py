@@ -668,16 +668,110 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
                 "tags": ("phase-2",),
             }
         ),
-    )
-    specs = (
-        (
+        _completed(
             "engineering-memory",
             "Engineering Memory",
+            (
+                "Preserves deterministic engineering lineage across "
+                "Mission Plans, Task Sets, and Impact Assessments."
+            ),
             "2.4",
             Category.KNOWLEDGE,
-            Access.FORGE_INTERNAL_WRITE,
-            Approval.NONE,
+            requires=(
+                "mission-planning",
+                "task-management",
+                "impact-decision-engine",
+            ),
+            inputs=(
+                _input(
+                    "mission-plan",
+                    InputType.UNKNOWN,
+                    producer="mission-planning",
+                ),
+                _input(
+                    "task-set",
+                    InputType.UNKNOWN,
+                    producer="task-management",
+                ),
+                _input(
+                    "impact-assessment",
+                    InputType.UNKNOWN,
+                    producer="impact-decision-engine",
+                ),
+                _input(
+                    "configuration",
+                    InputType.CONFIGURATION,
+                ),
+            ),
+            outputs=(
+                _output(
+                    "engineering-memory-store",
+                    OutputType.PLAN,
+                    "memory/engineering-memory.json",
+                ),
+                _output(
+                    "engineering-memory-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/ENGINEERING_MEMORY.json",
+                ),
+                _output(
+                    "engineering-memory-summary",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/ENGINEERING_MEMORY_SUMMARY.json",
+                ),
+                _output(
+                    "engineering-memory-lineage",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/ENGINEERING_MEMORY_LINEAGE.json",
+                ),
+                _output(
+                    "engineering-memory-markdown",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/ENGINEERING_MEMORY.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge memory build",
+                    description=(
+                        "Build Engineering Memory from persisted "
+                        "Mission, Task, and Impact artifacts."
+                    ),
+                    primary=True,
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge memory list",
+                    description=("List persisted Engineering Memory records."),
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge memory show",
+                    description=("Show one persisted Engineering Memory record."),
+                    requires_target=False,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/ENGINEERING_MEMORY.md",
+                "docs/contracts/ENGINEERING_MEMORY_CONTRACT.md",
+            ),
+            limitations=(
+                "No semantic search, embeddings, task execution, "
+                "source editing, build execution, test execution, "
+                "migration, Git mutation, deployment, approval "
+                "granting, or autonomous remediation.",
+            ),
+        ).model_copy(
+            update={
+                "forge_version": "0.3",
+                "phase": "2",
+                "access_mode": Access.FORGE_INTERNAL_WRITE,
+                "tags": ("phase-2",),
+            }
         ),
+    )
+    specs = (
         (
             "mission-reporting",
             "Mission Reporting",
