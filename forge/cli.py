@@ -49,6 +49,7 @@ from forge.diagnostics.errors import (
 from forge.diagnostics.models import DiagnosticCategory, DiagnosticConfiguration, HealthStatus
 from forge.discovery import DiscoveryError, DiscoveryService
 from forge.engineering_memory.cli import memory_app
+from forge.execution_controller.cli import execution_app
 from forge.impact.cli import impact_app
 from forge.indexing import (
     IndexConfiguration,
@@ -93,6 +94,7 @@ app.add_typer(task_app, name="task")
 app.add_typer(impact_app, name="impact")
 app.add_typer(memory_app, name="memory")
 app.add_typer(report_app, name="report")
+app.add_typer(execution_app, name="execution")
 
 
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
