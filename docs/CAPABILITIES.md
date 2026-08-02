@@ -21,7 +21,7 @@ Planned mutating features declare approval requirements, but no approval workflo
 
 Completed entries are `workspace-management`, `repository-discovery`,
 `incremental-project-index`, `engineering-knowledge-graph`, and `capability-registry`. Planned,
-unavailable examples include `mission-planning`, `safe-code-editing`, and `erp-module-analysis`.
+unavailable examples include `safe-code-editing`, `erp-module-analysis`, and other roadmap capabilities.
 
 ## Evaluation And Validation
 
@@ -88,3 +88,41 @@ store when rendering fails.
 Schema `1.0` stability, public model fields, query behavior, CLI compatibility, and migration policy
 are frozen in `docs/contracts/CAPABILITY_REGISTRY_CONTRACT.md`. Known limitations remain: the
 registry is global, the catalogue is trusted checked-in code, and availability is target-independent.
+
+## Mission Planning Capability
+
+- Capability ID: `mission-planning`
+- Forge version: `0.3`
+- Phase: `2`
+- Milestone: `2.1`
+- Lifecycle: `available`
+- Implementation: `implemented`
+- Maturity: `stable`
+- Access mode: `read_only`
+
+Primary command:
+
+    forge mission plan "<engineering request>" --target <workspace>
+
+Required capabilities:
+
+- `workspace-management`
+- `repository-discovery`
+- `incremental-project-index`
+- `engineering-knowledge-graph`
+- `capability-registry`
+- `runtime-configuration`
+- `runtime-health-diagnostics`
+- `phase-validation-release`
+
+Current registry inventory:
+
+- Total: 31
+- Implemented and available: 9
+- Planned and unavailable: 22
+
+The historical Forge v0.2 Phase 1 inventory remains frozen at 8 implemented
+and 23 planned capabilities.
+
+Mission Planning performs no code editing, execution, build, test, migration,
+Git mutation, deployment, or remediation.

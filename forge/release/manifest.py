@@ -4,12 +4,23 @@ import hashlib
 import json
 
 from forge.capabilities.catalogue import built_in_catalogue
-from forge.capabilities.models import CapabilityImplementationStatus
 from forge.release.models import (
     PhaseReleaseManifest,
     PhaseSchemaEntry,
     ReleaseDecision,
 )
+
+PHASE_1_IMPLEMENTED_CAPABILITY_IDS = (
+    "capability-registry",
+    "engineering-knowledge-graph",
+    "incremental-project-index",
+    "phase-validation-release",
+    "repository-discovery",
+    "runtime-configuration",
+    "runtime-health-diagnostics",
+    "workspace-management",
+)
+
 
 SCHEMAS = (
     PhaseSchemaEntry(
@@ -71,19 +82,9 @@ SCHEMAS = (
 def build_release_manifest() -> PhaseReleaseManifest:
     """Build the immutable, Git-independent release evidence model."""
     catalogue = built_in_catalogue()
-    implemented = tuple(
-        sorted(
-            item.capability_id
-            for item in catalogue
-            if item.implementation_status is CapabilityImplementationStatus.IMPLEMENTED
-        )
-    )
+    implemented = PHASE_1_IMPLEMENTED_CAPABILITY_IDS
     planned = tuple(
-        sorted(
-            item.capability_id
-            for item in catalogue
-            if item.implementation_status is CapabilityImplementationStatus.NOT_IMPLEMENTED
-        )
+        sorted(item.capability_id for item in catalogue if item.capability_id not in implemented)
     )
     return PhaseReleaseManifest(
         product="Aerion Forge",

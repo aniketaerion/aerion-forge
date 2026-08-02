@@ -73,6 +73,7 @@ def test_catalogue_is_complete_unique_and_truthful() -> None:
         "runtime-configuration",
         "runtime-health-diagnostics",
         "phase-validation-release",
+        "mission-planning",
     }
     assert completed <= set(ids)
     assert all(
@@ -127,7 +128,7 @@ def test_unknown_disabled_id_strict_and_non_strict() -> None:
     result = _build(
         CapabilityRegistryConfiguration(disabled_ids=("missing",), strict_validation=False)
     )
-    assert result.registry.statistics.available_capabilities == 8
+    assert result.registry.statistics.available_capabilities == 9
 
 
 def test_deterministic_build_and_query_api() -> None:
@@ -135,8 +136,8 @@ def test_deterministic_build_and_query_api() -> None:
     second = _build().registry
     assert first.generation == second.generation
     query = CapabilityRegistryQuery(first)
-    assert len(query.list_available_capabilities()) == 8
-    assert len(query.list_planned_capabilities()) == 23
+    assert len(query.list_available_capabilities()) == 9
+    assert len(query.list_planned_capabilities()) == 22
     assert query.get_capabilities_by_category(CapabilityCategory.KNOWLEDGE)
     assert query.get_capabilities_for_project_type("React")
     assert query.get_required_capabilities("engineering-knowledge-graph")
@@ -182,8 +183,31 @@ def test_cli_list_detail_filters_and_unknown(
     monkeypatch.chdir(tmp_path)
     runner = CliRunner()
     assert runner.invoke(app, ["capabilities"]).exit_code == 0
-    planned = runner.invoke(app, ["capabilities", "--planned", "--category", "planning", "--json"])
-    assert planned.exit_code == 0 and "mission-planning" in planned.stdout
+    planned = runner.invoke(
+        app,
+        [
+            "capabilities",
+            "--planned",
+            "--category",
+            "planning",
+            "--json",
+        ],
+    )
+    assert planned.exit_code == 0
+    assert "mission-planning" not in planned.stdout
+
+    available = runner.invoke(
+        app,
+        [
+            "capabilities",
+            "--available",
+            "--category",
+            "planning",
+            "--json",
+        ],
+    )
+    assert available.exit_code == 0
+    assert "mission-planning" in available.stdout
     detail = runner.invoke(app, ["capability", "capability-registry", "--json"])
     assert detail.exit_code == 0 and '"available": true' in detail.stdout
     assert runner.invoke(app, ["capability", "knowledge-graph"]).exit_code == 2

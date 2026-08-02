@@ -1,4 +1,42 @@
-﻿# Changelog
+## Aerion Forge v0.3 - Milestone 2.1
+
+### Added
+
+- Deterministic `forge.planning` subsystem
+- Typed Mission Planning schema `1.0`
+- Engineering-request normalization
+- Persisted Phase 1 context loading
+- Prerequisite and graph-freshness validation
+- Risk and approval classification
+- Ready, ready-with-conditions, and blocked states
+- Atomic mission persistence with bounded history and rollback
+- Deterministic JSON and Markdown reports
+- Read-only Mission Planning query API
+- `forge mission plan` CLI
+- Nine `planning.*` configuration settings
+- Mission Planning documentation and contract
+
+### Changed
+
+- Promoted `mission-planning` to implemented, stable, and available
+- Current capability inventory is 9 implemented and 22 planned
+- Runtime configuration catalogue increased to 49 settings
+- Preserved the historical Phase 1 inventory at 8 implemented and 23 planned
+
+### Validation
+
+- Ruff passed
+- mypy passed across 152 source files
+- pytest: 176 passed
+- `git diff --check` passed
+
+### Safety
+
+Milestone 2.1 performs planning only. It does not edit source code, execute
+target builds or tests, run migrations, mutate Git, deploy software, execute
+tasks, or perform automatic remediation.
+
+# Changelog
 
 ## Version 0.2.0 - Phase 1 Engineering Runtime
 

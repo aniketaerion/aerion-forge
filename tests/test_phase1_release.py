@@ -138,7 +138,7 @@ def test_phase1_end_to_end_is_read_only_and_deterministic(tmp_path: Path) -> Non
     assert query.get_result("discovery-index-consistent").status is HealthStatus.HEALTHY
     assert query.get_result("index-graph-consistent").status is HealthStatus.HEALTHY
     assert runtime_health.snapshot.summary.unhealthy_count == 0
-    assert capabilities.registry.statistics.available_capabilities == 8
+    assert capabilities.registry.statistics.available_capabilities == 9
     assert configuration.snapshot.validation.valid
     assert _snapshot(target) == before
     assert not any(path.name in {"memory", "reports"} for path in target.iterdir())
@@ -155,11 +155,22 @@ def test_release_inventory_version_and_phase2_boundary() -> None:
     assert len(manifest.planned_capability_ids) == 23
     assert "phase-validation-release" in manifest.implemented_capability_ids
     assert "mission-planning" in manifest.planned_capability_ids
-    assert all(
-        item.implementation_status is CapabilityImplementationStatus.NOT_IMPLEMENTED
-        for item in catalogue
-        if item.capability_id in manifest.planned_capability_ids
+    assert set(manifest.implemented_capability_ids).isdisjoint(
+        manifest.planned_capability_ids
     )
+    assert (
+        set(manifest.implemented_capability_ids)
+        | set(manifest.planned_capability_ids)
+        == {item.capability_id for item in catalogue}
+    )
+
+    current_implemented = {
+        item.capability_id
+        for item in catalogue
+        if item.implementation_status
+        is CapabilityImplementationStatus.IMPLEMENTED
+    }
+    assert "mission-planning" in current_implemented
     assert len(manifest.schemas) == 7
     assert len(manifest.persistence_files) == 7
 

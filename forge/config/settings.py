@@ -49,6 +49,15 @@ class Settings(BaseSettings):
     diagnostics_history_limit: int = Field(default=5, ge=0, le=100)
     diagnostics_include_optional: bool = True
     diagnostics_write_probe_enabled: bool = True
+    planning_enabled: bool = True
+    planning_strict: bool = False
+    planning_history_limit: int = Field(default=5, ge=0, le=100)
+    planning_max_affected_areas: int = Field(default=25, ge=1, le=1000)
+    planning_max_workstreams: int = Field(default=8, ge=1, le=50)
+    planning_max_assumptions: int = Field(default=12, ge=1, le=100)
+    planning_max_questions: int = Field(default=12, ge=1, le=100)
+    planning_require_current_graph: bool = True
+    planning_allow_degraded_runtime: bool = True
     allow_shell: bool = False
     allow_docker: bool = False
     allow_database: bool = False
@@ -137,6 +146,15 @@ class Settings(BaseSettings):
             diagnostics_history_limit=int(values["diagnostics.history_limit"]),
             diagnostics_include_optional=bool(values["diagnostics.include_optional"]),
             diagnostics_write_probe_enabled=bool(values["diagnostics.write_probe_enabled"]),
+            planning_enabled=bool(values["planning.enabled"]),
+            planning_strict=bool(values["planning.strict"]),
+            planning_history_limit=int(values["planning.history_limit"]),
+            planning_max_affected_areas=int(values["planning.max_affected_areas"]),
+            planning_max_workstreams=int(values["planning.max_workstreams"]),
+            planning_max_assumptions=int(values["planning.max_assumptions"]),
+            planning_max_questions=int(values["planning.max_questions"]),
+            planning_require_current_graph=bool(values["planning.require_current_graph"]),
+            planning_allow_degraded_runtime=bool(values["planning.allow_degraded_runtime"]),
             allow_shell=bool(values["security.allow_shell"]),
             allow_docker=bool(values["security.allow_docker"]),
             allow_database=bool(values["security.allow_database"]),

@@ -1,4 +1,4 @@
-﻿# Aerion Forge
+# Aerion Forge
 
 Aerion Forge v0.2 is the Phase 1 Engineering Runtime: a local deterministic platform for
 workspace management, repository discovery, incremental indexing, structural knowledge graphs,
@@ -170,3 +170,67 @@ reports/latest/KNOWLEDGE_*.md    Summary, changes, and orphan reports
 ```
 
 Run `forge inspect <target>` and `forge index <target>` before graph construction. See [docs/KNOWLEDGE_GRAPH.md](docs/KNOWLEDGE_GRAPH.md) for identity, resolution, evidence, confidence, validation, performance, safety, and query rules.
+
+## Phase 2 - Milestone 2.1: Mission Planning Engine
+
+Aerion Forge v0.3 includes a deterministic, read-only Mission Planning Engine.
+
+The planner converts an engineering request into an evidence-grounded mission
+plan using persisted workspace, discovery, index, knowledge-graph,
+configuration, capability, and diagnostic state.
+
+### Command
+
+    forge mission plan "Complete Procurement Module" --target ERP
+
+Supported options:
+
+- `--json`
+- `--summary`
+- `--context`
+- `--risks`
+- `--assumptions`
+- `--questions`
+- `--strict`
+- `--no-persist`
+
+### Persistence and Reports
+
+Canonical mission persistence:
+
+    memory/missions.json
+
+Generated reports:
+
+- `MISSION_PLAN.json`
+- `MISSION_SUMMARY.json`
+- `MISSION_CONTEXT.json`
+- `MISSION_RISKS.json`
+- `MISSION_ASSUMPTIONS.json`
+- `MISSION_QUESTIONS.json`
+- `MISSION_CHANGES.json`
+- `MISSION_PLAN.md`
+- `MISSION_SUMMARY.md`
+
+### Safety Boundary
+
+Milestone 2.1 performs planning only. It does not edit source code, execute
+target builds or tests, run migrations, mutate Git, deploy software, execute
+tasks, or perform automatic remediation.
+
+### Current Inventory
+
+- Total capabilities: 31
+- Implemented and available: 9
+- Planned and unavailable: 22
+- Runtime configuration settings: 49
+- Mission Planning settings: 9
+
+The historical Forge v0.2 Phase 1 release inventory remains frozen at eight
+implemented capabilities and 23 planned capabilities.
+
+Validation:
+
+- Ruff passed
+- mypy passed across 152 source files
+- pytest: 176 passed

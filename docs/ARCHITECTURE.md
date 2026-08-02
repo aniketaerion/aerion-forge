@@ -1,4 +1,4 @@
-﻿# Aerion Forge Architecture
+# Aerion Forge Architecture
 
 Version 0.2 Phase 1 freezes the Engineering Runtime subsystem boundaries.
 
@@ -139,3 +139,42 @@ workspace + discovery + project index
 The graph layer never invokes repository discovery or indexing and performs no filesystem traversal. Stable canonical IDs derive from controlled type, repository or workspace identity, normalized relative path, and canonical technology names. Edge IDs hash one directional source/type/target tuple. Typed dictionaries deduplicate entities before strict referential validation.
 
 A bounded structural module groups major paths beneath discovered component roots; it does not represent source-language modules. Full deterministic rebuild plus incremental comparison is the Milestone 1.4 update strategy. See [KNOWLEDGE_GRAPH.md](KNOWLEDGE_GRAPH.md) for the complete contract.
+
+## Phase 2 Mission Planning Architecture
+
+Milestone 2.1 introduces the `forge.planning` subsystem.
+
+### Components
+
+- `models.py` - typed mission models and controlled enums
+- `normalizer.py` - deterministic engineering-request normalization
+- `context.py` - read-only loading of persisted Forge state
+- `policies.py` - planning policy and milestone exclusions
+- `planner.py` - prerequisite, risk, approval, scope, and readiness logic
+- `validator.py` - plan contract validation
+- `store.py` - atomic persistence and bounded history
+- `renderer.py` - deterministic JSON and Markdown reports
+- `query.py` - immutable read-only mission queries
+- `service.py` - orchestration, rollback, persistence, and reporting
+- `cli.py` - `forge mission plan`
+
+### Data Flow
+
+    Engineering request
+        -> normalization
+        -> persisted context loading
+        -> prerequisite evaluation
+        -> risk and approval classification
+        -> readiness evaluation
+        -> validated mission plan
+        -> persistence and reports
+
+### Safety Boundary
+
+The subsystem reads Forge-owned persisted evidence only. It does not traverse
+source files, edit target code, execute subprocesses, run target builds or
+tests, perform migrations, mutate Git, deploy software, or remediate issues.
+
+The historical Phase 1 release manifest remains frozen at 8 implemented and
+23 planned capabilities. The live Milestone 2.1 registry contains 9 implemented
+and 22 planned capabilities.

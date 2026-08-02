@@ -423,16 +423,73 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
                 "Produces release evidence only; it does not commit, tag, push, or publish.",
             ),
         ),
-    )
-    specs = (
-        (
+        _completed(
             "mission-planning",
             "Mission Planning",
+            "Creates deterministic, evidence-grounded mission-level plans without execution.",
             "2.1",
             Category.PLANNING,
-            Access.READ_ONLY,
-            Approval.NONE,
+            requires=(
+                "workspace-management",
+                "repository-discovery",
+                "incremental-project-index",
+                "engineering-knowledge-graph",
+                "capability-registry",
+                "runtime-configuration",
+                "runtime-health-diagnostics",
+                "phase-validation-release",
+            ),
+            inputs=(
+                _input("engineering-request", InputType.USER_REQUEST),
+                _input("workspace-state", InputType.WORKSPACE_STATE),
+                _input("discovery-state", InputType.DISCOVERY_STATE),
+                _input("index-state", InputType.INDEX_STATE),
+                _input("knowledge-graph-state", InputType.KNOWLEDGE_GRAPH_STATE),
+                _input("configuration", InputType.CONFIGURATION),
+            ),
+            outputs=(
+                _output(
+                    "mission-plan",
+                    OutputType.PLAN,
+                    "memory/missions.json",
+                ),
+                _output(
+                    "mission-plan-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/MISSION_PLAN.json",
+                ),
+                _output(
+                    "mission-summary",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/MISSION_SUMMARY.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge mission plan",
+                    description="Create a mission-level plan.",
+                    primary=True,
+                    requires_target=False,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/MISSION_PLANNING.md",
+                "docs/contracts/MISSION_PLANNING_CONTRACT.md",
+            ),
+            limitations=(
+                "Read-only planning; no source analysis, target execution, or target mutation.",
+            ),
+        ).model_copy(
+            update={
+                "forge_version": "0.3",
+                "phase": "2",
+                "access_mode": Access.READ_ONLY,
+                "tags": ("phase-2",),
+            }
         ),
+    )
+    specs = (
         (
             "task-management",
             "Task Management",

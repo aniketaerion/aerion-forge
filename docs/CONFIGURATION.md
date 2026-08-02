@@ -28,3 +28,22 @@ Use `forge config show`, `get`, `explain`, `validate`, `profiles`, and `fingerpr
 `ConfigurationQuery` provides typed lookup and filtering. Existing `AERION_` variables remain
 aliases; canonical `FORGE_` variables win. `Settings` remains the compatibility facade. Runtime
 Live reload remains deferred; runtime health diagnostics are implemented in Phase 1.
+
+## Mission Planning Settings
+
+Milestone 2.1 adds the `planning` namespace.
+
+| Key | Type | Default | Constraint |
+|---|---|---:|---|
+| `planning.enabled` | boolean | `true` | - |
+| `planning.strict` | boolean | `false` | - |
+| `planning.history_limit` | integer | `5` | 0-100 |
+| `planning.max_affected_areas` | integer | `25` | 1-1000 |
+| `planning.max_workstreams` | integer | `8` | 1-50 |
+| `planning.max_assumptions` | integer | `12` | 1-100 |
+| `planning.max_questions` | integer | `12` | 1-100 |
+| `planning.require_current_graph` | boolean | `true` | - |
+| `planning.allow_degraded_runtime` | boolean | `true` | - |
+
+The runtime configuration catalogue now contains 49 settings, including
+9 Mission Planning settings.
