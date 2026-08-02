@@ -48,6 +48,7 @@ from forge.diagnostics.errors import (
 )
 from forge.diagnostics.models import DiagnosticCategory, DiagnosticConfiguration, HealthStatus
 from forge.discovery import DiscoveryError, DiscoveryService
+from forge.impact.cli import impact_app
 from forge.indexing import (
     IndexConfiguration,
     IndexingError,
@@ -87,6 +88,7 @@ app.add_typer(workspace_app, name="workspace")
 app.add_typer(config_app, name="config")
 app.add_typer(mission_app, name="mission")
 app.add_typer(task_app, name="task")
+app.add_typer(impact_app, name="impact")
 
 
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
