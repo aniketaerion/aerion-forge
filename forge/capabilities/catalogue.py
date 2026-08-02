@@ -770,16 +770,110 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
                 "tags": ("phase-2",),
             }
         ),
-    )
-    specs = (
-        (
+        _completed(
             "mission-reporting",
             "Mission Reporting",
+            (
+                "Produces deterministic engineering reports from "
+                "Mission Plans, Task Sets, Impact Assessments, and "
+                "Engineering Memory."
+            ),
             "2.5",
             Category.DOCUMENTATION,
-            Access.FORGE_INTERNAL_WRITE,
-            Approval.NONE,
+            requires=(
+                "mission-planning",
+                "task-management",
+                "impact-decision-engine",
+                "engineering-memory",
+            ),
+            inputs=(
+                _input(
+                    "mission-plan",
+                    InputType.UNKNOWN,
+                    producer="mission-planning",
+                ),
+                _input(
+                    "task-set",
+                    InputType.UNKNOWN,
+                    producer="task-management",
+                ),
+                _input(
+                    "impact-assessment",
+                    InputType.UNKNOWN,
+                    producer="impact-decision-engine",
+                ),
+                _input(
+                    "engineering-memory",
+                    InputType.UNKNOWN,
+                    producer="engineering-memory",
+                ),
+                _input(
+                    "configuration",
+                    InputType.CONFIGURATION,
+                ),
+            ),
+            outputs=(
+                _output(
+                    "mission-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/MISSION_REPORT.json",
+                ),
+                _output(
+                    "mission-report-summary",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/MISSION_SUMMARY.json",
+                ),
+                _output(
+                    "mission-report-traceability",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/MISSION_TRACEABILITY.json",
+                ),
+                _output(
+                    "mission-report-risks",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/MISSION_RISKS.json",
+                ),
+                _output(
+                    "mission-report-markdown",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/MISSION_REPORT.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge report build",
+                    description=(
+                        "Build a deterministic Mission Report from persisted engineering artifacts."
+                    ),
+                    primary=True,
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge report show",
+                    description=("Show the latest persisted Mission Report."),
+                    requires_target=False,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/MISSION_REPORTING.md",
+                "docs/contracts/MISSION_REPORTING_CONTRACT.md",
+            ),
+            limitations=(
+                "No task execution, source editing, build execution, "
+                "test execution, migration, Git mutation, deployment, "
+                "approval granting, or autonomous remediation.",
+            ),
+        ).model_copy(
+            update={
+                "forge_version": "0.3",
+                "phase": "2",
+                "access_mode": Access.FORGE_INTERNAL_WRITE,
+                "tags": ("phase-2",),
+            }
         ),
+    )
+    specs = (
         (
             "execution-controller",
             "Execution Controller",
