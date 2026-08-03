@@ -153,7 +153,7 @@ def _planned(
 
 def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
     """Return a fresh, deterministically sorted catalogue."""
-    completed = (
+    completed: tuple[CapabilityDefinition, ...] = (
         _completed(
             "workspace-management",
             "Workspace Management",
@@ -1007,15 +1007,166 @@ def built_in_catalogue() -> tuple[CapabilityDefinition, ...]:
             }
         ),
     )
-    specs = (
-        (
+    completed = (
+        *completed,
+        _completed(
             "safe-change-planning",
             "Safe Change Planning",
+            (
+                "Creates deterministic, read-only Safe Change Plans from "
+                "validated engineering lineage; identifies change targets, "
+                "orders implementation actions, assesses risk, defines "
+                "verification and rollback controls, and produces auditable "
+                "planning reports without modifying the target repository."
+            ),
             "3.2",
             Category.PLANNING,
-            Access.READ_ONLY,
-            Approval.NONE,
+            requires=(
+                "mission-planning",
+                "task-management",
+                "impact-decision-engine",
+                "engineering-memory",
+                "mission-reporting",
+            ),
+            inputs=(
+                _input(
+                    "mission-plan",
+                    InputType.UNKNOWN,
+                    producer="mission-planning",
+                ),
+                _input(
+                    "task-set",
+                    InputType.UNKNOWN,
+                    producer="task-management",
+                ),
+                _input(
+                    "impact-assessment",
+                    InputType.UNKNOWN,
+                    producer="impact-decision-engine",
+                ),
+                _input(
+                    "engineering-memory",
+                    InputType.UNKNOWN,
+                    producer="engineering-memory",
+                ),
+                _input(
+                    "mission-report",
+                    InputType.UNKNOWN,
+                    producer="mission-reporting",
+                ),
+                _input(
+                    "configuration",
+                    InputType.CONFIGURATION,
+                ),
+            ),
+            outputs=(
+                _output(
+                    "safe-change-request",
+                    OutputType.PLAN,
+                    "memory/safe-change-request.json",
+                ),
+                _output(
+                    "safe-change-plan",
+                    OutputType.PLAN,
+                    "memory/safe-change-plan.json",
+                ),
+                _output(
+                    "safe-change-plan-report",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/SAFE_CHANGE_PLAN.json",
+                ),
+                _output(
+                    "safe-change-summary",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/SAFE_CHANGE_SUMMARY.json",
+                ),
+                _output(
+                    "safe-change-targets",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/SAFE_CHANGE_TARGETS.json",
+                ),
+                _output(
+                    "safe-change-risks",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/SAFE_CHANGE_RISKS.json",
+                ),
+                _output(
+                    "safe-change-verification",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/SAFE_CHANGE_VERIFICATION.json",
+                ),
+                _output(
+                    "safe-change-rollback",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/SAFE_CHANGE_ROLLBACK.json",
+                ),
+                _output(
+                    "safe-change-traceability",
+                    OutputType.JSON_REPORT,
+                    "reports/latest/SAFE_CHANGE_TRACEABILITY.json",
+                ),
+                _output(
+                    "safe-change-markdown",
+                    OutputType.MARKDOWN_REPORT,
+                    "reports/latest/SAFE_CHANGE_PLAN.md",
+                ),
+            ),
+            commands=(
+                Command(
+                    command="forge safe-change request",
+                    description=("Create and persist a deterministic Safe Change request."),
+                    primary=True,
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge safe-change validate",
+                    description=("Validate the persisted Safe Change request."),
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge safe-change show",
+                    description=("Show a persisted Safe Change request or plan."),
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge safe-change list",
+                    description=("List persisted Safe Change Planning artifacts."),
+                    requires_target=False,
+                ),
+                Command(
+                    command="forge safe-change render",
+                    description=("Render the Safe Change Plan report suite."),
+                    requires_target=False,
+                ),
+            ),
+            scope=Scope.GLOBAL,
+            docs=(
+                "docs/safe_change_planning/ARCHITECTURE.md",
+                "docs/safe_change_planning/SPECIFICATION.md",
+                "docs/safe_change_planning/DATA_MODEL.md",
+                "docs/safe_change_planning/RISK_MODEL.md",
+                "docs/safe_change_planning/PLANNING_ALGORITHM.md",
+                "docs/safe_change_planning/API_CONTRACT.md",
+                "docs/safe_change_planning/TEST_PLAN.md",
+                "docs/safe_change_planning/ACCEPTANCE_CRITERIA.md",
+            ),
+            limitations=(
+                "Safe Change Planning is read-only. It does not edit source "
+                "files, execute tools, run builds or tests, mutate Git, apply "
+                "database migrations, deploy software, or approve execution.",
+            ),
+        ).model_copy(
+            update={
+                "forge_version": "0.3",
+                "phase": "3",
+                "access_mode": Access.READ_ONLY,
+                "approval_policy": Approval.NONE,
+                "tags": ("phase-3",),
+            }
         ),
+    )
+
+    specs = (
         (
             "safe-code-editing",
             "Safe Code Editing",
