@@ -1,7 +1,10 @@
 """Repository enumeration, classification, and safe text inspection."""
 
+import ast
+import io
 import json
 import re
+import tokenize
 import tomllib
 from collections import Counter
 from pathlib import Path
@@ -23,10 +26,13 @@ IGNORED_DIRECTORIES = {
     ".tox",
     ".venv",
     "__pycache__",
+    "audit",
     "build",
     "coverage",
     "dist",
+    "memory",
     "node_modules",
+    "reports",
     "target",
     "vendor",
 }
@@ -305,55 +311,171 @@ class RepositoryScanner:
 
     def _inspect_sources(self, files: list[Path]) -> list[Finding]:
         findings: list[Finding] = []
-        patterns = [
-            (re.compile(r"\bTODO\b", re.I), "TODO", "medium"),
-            (re.compile(r"\bFIXME\b", re.I), "FIXME", "high"),
-            (
-                re.compile(
-                    r"\bNotImplemented(Error)?\b|raise\s+NotImplementedError|^\s*pass\s*(#.*)?$"
-                ),
-                "Incomplete module",
-                "high",
-            ),
-        ]
+        seen: set[tuple[str, str, int | None, str]] = set()
         route_pattern = re.compile(
-            r"@(app|router)\.(get|post|put|patch|delete)|\b(app|router)\.(get|post|put|patch|delete)\s*\(",
+            r"@(app|router)\.(get|post|put|patch|delete)|"
+            r"\b(app|router)\.(get|post|put|patch|delete)\s*\(",
             re.I,
         )
+
         for path in files:
-            if (
-                path.suffix.lower() not in TEXT_SUFFIXES
-                or path.stat().st_size > self.max_file_bytes
-            ):
+            if path.suffix.lower() not in LANGUAGES:
                 continue
+            if path.stat().st_size > self.max_file_bytes:
+                continue
+
+            relative_path = path.relative_to(self.root)
+            relative = relative_path.as_posix()
+            relative_parts = {part.lower() for part in relative_path.parts}
+            if relative_parts & {"test", "tests", "spec", "specs"}:
+                continue
+
             try:
-                lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+                source = path.read_text(encoding="utf-8-sig", errors="replace")
             except OSError:
                 continue
-            relative = path.relative_to(self.root).as_posix()
-            for number, line in enumerate(lines, 1):
-                for pattern, category, severity in patterns:
-                    if pattern.search(line):
-                        findings.append(
-                            Finding(
-                                category=category,
-                                severity=severity,
-                                message=line.strip()[:300],
-                                path=relative,
-                                line=number,
-                            )
-                        )
+
+            if path.suffix.lower() == ".py":
+                findings.extend(self._inspect_python_source(relative, source, seen))
+            else:
+                for number, line in enumerate(source.splitlines(), 1):
+                    self._append_marker_finding(findings, seen, relative, number, line)
+
+            for number, line in enumerate(source.splitlines(), 1):
                 if route_pattern.search(line):
-                    findings.append(
+                    self._append_finding(
+                        findings,
+                        seen,
                         Finding(
                             category="API route",
                             severity="info",
                             message=line.strip()[:300],
                             path=relative,
                             line=number,
-                        )
+                        ),
                     )
         return findings
+
+    def _inspect_python_source(
+        self,
+        relative: str,
+        source: str,
+        seen: set[tuple[str, str, int | None, str]],
+    ) -> list[Finding]:
+        findings: list[Finding] = []
+
+        try:
+            tokens = tokenize.generate_tokens(io.StringIO(source).readline)
+            for token in tokens:
+                if token.type == tokenize.COMMENT:
+                    self._append_marker_finding(
+                        findings, seen, relative, token.start[0], token.string
+                    )
+        except (IndentationError, SyntaxError, tokenize.TokenError):
+            pass
+
+        try:
+            tree = ast.parse(source)
+        except SyntaxError as exc:
+            self._append_finding(
+                findings,
+                seen,
+                Finding(
+                    category="Invalid Python syntax",
+                    severity="high",
+                    message=exc.msg,
+                    path=relative,
+                    line=exc.lineno,
+                ),
+            )
+            return findings
+
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                body = list(node.body)
+                if (
+                    body
+                    and isinstance(body[0], ast.Expr)
+                    and isinstance(body[0].value, ast.Constant)
+                    and isinstance(body[0].value.value, str)
+                ):
+                    body = body[1:]
+                if len(body) == 1 and isinstance(body[0], ast.Pass):
+                    self._append_finding(
+                        findings,
+                        seen,
+                        Finding(
+                            category="Incomplete function",
+                            severity="high",
+                            message=f"{node.name} contains only pass",
+                            path=relative,
+                            line=node.lineno,
+                        ),
+                    )
+
+            if isinstance(node, ast.Raise) and self._is_not_implemented_raise(node):
+                self._append_finding(
+                    findings,
+                    seen,
+                    Finding(
+                        category="Not implemented",
+                        severity="high",
+                        message="Raises NotImplementedError",
+                        path=relative,
+                        line=node.lineno,
+                    ),
+                )
+        return findings
+
+    @staticmethod
+    def _is_not_implemented_raise(node: ast.Raise) -> bool:
+        exception = node.exc
+        if isinstance(exception, ast.Name):
+            return exception.id == "NotImplementedError"
+        if isinstance(exception, ast.Call) and isinstance(exception.func, ast.Name):
+            return exception.func.id == "NotImplementedError"
+        return False
+
+    @staticmethod
+    def _append_marker_finding(
+        findings: list[Finding],
+        seen: set[tuple[str, str, int | None, str]],
+        relative: str,
+        number: int,
+        line: str,
+    ) -> None:
+        for pattern, category, severity in (
+            (re.compile(r"\bTODO\b", re.I), "TODO", "medium"),
+            (re.compile(r"\bFIXME\b", re.I), "FIXME", "high"),
+        ):
+            if pattern.search(line):
+                RepositoryScanner._append_finding(
+                    findings,
+                    seen,
+                    Finding(
+                        category=category,
+                        severity=severity,
+                        message=line.strip()[:300],
+                        path=relative,
+                        line=number,
+                    ),
+                )
+
+    @staticmethod
+    def _append_finding(
+        findings: list[Finding],
+        seen: set[tuple[str, str, int | None, str]],
+        finding: Finding,
+    ) -> None:
+        key = (
+            finding.category,
+            finding.path or "",
+            finding.line,
+            " ".join(finding.message.split()),
+        )
+        if key not in seen:
+            seen.add(key)
+            findings.append(finding)
 
     @staticmethod
     def _testing_findings(inventory: RepositoryInventory) -> list[Finding]:
