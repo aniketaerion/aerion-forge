@@ -19,6 +19,10 @@ from forge.safe_code_editing.models import (
     SafeEditRequest,
 )
 from forge.safe_code_editing.policies import SafeEditPolicy
+from forge.safe_code_editing.service import (
+    SafeCodeEditingService,
+    SafeEditRequestLoadError,
+)
 
 __all__ = [
     "EditOperation",
@@ -28,9 +32,11 @@ __all__ = [
     "FileEditResult",
     "FileSnapshot",
     "LoadedTextFile",
+    "SafeCodeEditingService",
     "SafeEditPolicy",
     "SafeEditReport",
     "SafeEditRequest",
+    "SafeEditRequestLoadError",
     "operation_identifier",
     "request_identifier",
     "source_fingerprint",
