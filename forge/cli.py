@@ -10,6 +10,7 @@ from rich.table import Table
 
 from forge import __version__
 from forge.agents import RepositoryAuditAgent
+from forge.autonomous_repair.cli import autonomous_repair_app
 from forge.capabilities import (
     CapabilityRegistryQuery,
     CapabilityRegistryRepository,
@@ -100,6 +101,7 @@ app.add_typer(report_app, name="report")
 app.add_typer(execution_app, name="execution")
 app.add_typer(safe_change_app, name="safe-change")
 app.add_typer(repair_app, name="repair")
+app.add_typer(autonomous_repair_app, name="autonomous-repair")
 app.add_typer(edit_app, name="edit")
 
 
