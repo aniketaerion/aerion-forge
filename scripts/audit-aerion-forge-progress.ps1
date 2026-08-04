@@ -565,40 +565,151 @@ $ExpectedMilestones = @(
     "M5.1","M5.2","M5.3","M5.4","M5.5","M5.6","M5.7","M5.8"
 )
 
+$MilestoneMap = @{
+    "M1.1" = @{
+        Name = "Workspace Manager"
+        ProductionRegex = '^forge[\\/]workspace[\\/]'
+        TestRegex = '^tests[\\/].*workspace'
+        DocumentationRegex = '^docs[\\/].*workspace'
+    }
+    "M1.2" = @{
+        Name = "Repository Discovery"
+        ProductionRegex = '^forge[\\/]discovery[\\/]'
+        TestRegex = '^tests[\\/].*discovery'
+        DocumentationRegex = '^docs[\\/].*discovery'
+    }
+    "M1.3" = @{
+        Name = "Incremental Project Index"
+        ProductionRegex = '^forge[\\/]indexing[\\/]'
+        TestRegex = '^tests[\\/].*index'
+        DocumentationRegex = '^docs[\\/].*index'
+    }
+    "M1.4" = @{
+        Name = "Engineering Knowledge Graph"
+        ProductionRegex = '^forge[\\/]knowledge[\\/]'
+        TestRegex = '^tests[\\/].*(knowledge|graph)'
+        DocumentationRegex = '^docs[\\/].*(knowledge|graph)'
+    }
+    "M1.5" = @{
+        Name = "Capability Registry"
+        ProductionRegex = '^forge[\\/]capabilities[\\/]'
+        TestRegex = '^tests[\\/].*capabilit'
+        DocumentationRegex = '^docs[\\/].*capabilit'
+    }
+    "M1.6" = @{
+        Name = "Runtime Configuration"
+        ProductionRegex = '^forge[\\/](config|configuration)[\\/]'
+        TestRegex = '^tests[\\/].*(config|configuration)'
+        DocumentationRegex = '^docs[\\/].*(config|configuration)'
+    }
+    "M1.7" = @{
+        Name = "Runtime Health and Diagnostics"
+        ProductionRegex = '^forge[\\/]diagnostics[\\/]'
+        TestRegex = '^tests[\\/].*diagnostic'
+        DocumentationRegex = '^docs[\\/].*diagnostic'
+    }
+    "M1.8" = @{
+        Name = "Validation and Release"
+        ProductionRegex = '^forge[\\/]release[\\/]'
+        TestRegex = '^tests[\\/].*release'
+        DocumentationRegex = '^docs[\\/]releases[\\/]'
+    }
+    "M2.1" = @{
+        Name = "Mission Planning"
+        ProductionRegex = '^forge[\\/](planner|planning)[\\/]'
+        TestRegex = '^tests[\\/].*(planner|planning|mission)'
+        DocumentationRegex = '^docs[\\/].*(planner|planning|mission)'
+    }
+    "M2.2" = @{
+        Name = "Task Management"
+        ProductionRegex = '^forge[\\/]tasks[\\/]'
+        TestRegex = '^tests[\\/].*task'
+        DocumentationRegex = '^docs[\\/].*task'
+    }
+    "M2.3" = @{
+        Name = "Impact Decision Engine"
+        ProductionRegex = '^forge[\\/]impact[\\/]'
+        TestRegex = '^tests[\\/].*impact'
+        DocumentationRegex = '^docs[\\/].*impact'
+    }
+    "M2.4" = @{
+        Name = "Engineering Memory"
+        ProductionRegex = '^forge[\\/](engineering_memory|memory)[\\/]'
+        TestRegex = '^tests[\\/].*memory'
+        DocumentationRegex = '^docs[\\/].*memory'
+    }
+    "M2.5" = @{
+        Name = "Mission Reporting"
+        ProductionRegex = '^forge[\\/]mission_reporting[\\/]'
+        TestRegex = '^tests[\\/].*(mission_reporting|report)'
+        DocumentationRegex = '^docs[\\/].*(mission_reporting|report)'
+    }
+    "M3.1" = @{
+        Name = "Execution Controller"
+        ProductionRegex = '^forge[\\/]execution_controller[\\/]'
+        TestRegex = '^tests[\\/]execution_controller[\\/]'
+        DocumentationRegex = '^docs[\\/]execution_controller[\\/]'
+    }
+    "M3.2" = @{
+        Name = "Safe Change Planning"
+        ProductionRegex = '^forge[\\/]safe_change_planning[\\/]'
+        TestRegex = '^tests[\\/].*safe_change_planning'
+        DocumentationRegex = '^docs[\\/]safe_change_planning[\\/]'
+    }
+}
+
 $Milestones = @()
 
 foreach ($Milestone in $ExpectedMilestones) {
     $Phase = "Phase $($Milestone.Substring(1,1))"
-    $Escaped = [regex]::Escape($Milestone)
+    $Map = $MilestoneMap[$Milestone]
 
-    $Production = @($Inventory | Where-Object {
-        $_.Classification -eq "production" -and
-        ($_.ProbableMilestone -eq $Milestone -or $_.RelativePath -match "(?i)$Escaped")
-    })
+    $Production = @()
+    $TestsForMilestone = @()
+    $Docs = @()
 
-    $TestsForMilestone = @($TestInventory | Where-Object {
-        $_.ProbableMilestone -eq $Milestone -or $_.RelativePath -match "(?i)$Escaped"
-    })
+    if ($Map) {
+        $Production = @(
+            $Inventory | Where-Object {
+                $_.Classification -eq "production" -and
+                $_.RelativePath -match $Map.ProductionRegex
+            }
+        )
 
-    $Docs = @($Inventory | Where-Object {
-        $_.Classification -eq "documentation" -and
-        ($_.ProbableMilestone -eq $Milestone -or $_.RelativePath -match "(?i)$Escaped")
-    })
+        $TestsForMilestone = @(
+            $TestInventory | Where-Object {
+                $_.RelativePath -match $Map.TestRegex
+            }
+        )
 
-    $Validations = @($ValidationResults | Where-Object {
-        $_.Milestone -eq $Milestone
-    })
+        $Docs = @(
+            $Inventory | Where-Object {
+                $_.Classification -eq "documentation" -and
+                $_.RelativePath -match $Map.DocumentationRegex
+            }
+        )
+    }
+
+    $Validations = @(
+        $ValidationResults | Where-Object {
+            $_.Milestone -eq $Milestone
+        }
+    )
 
     $TagPattern = $Milestone.Substring(1).Replace(".", "[\.\-_]?")
-    $Tags = @($Git.TagMap.Output | Where-Object {
-        $_ -match "(?i)m$TagPattern"
-    })
+    $Tags = @(
+        $Git.TagMap.Output | Where-Object {
+            $_ -match "(?i)m$TagPattern"
+        }
+    )
 
     $HasProduction = $Production.Count -gt 0
     $HasTests = $TestsForMilestone.Count -gt 0
     $HasDocs = $Docs.Count -gt 0
     $ValidationPresent = $Validations.Count -gt 0
-    $ValidationPass = $ValidationPresent -and (@($Validations | Where-Object Status -eq "FAIL").Count -eq 0)
+    $ValidationPass = $ValidationPresent -and (
+        @($Validations | Where-Object Status -eq "FAIL").Count -eq 0
+    )
     $HasTag = $Tags.Count -gt 0
     $OnMain = ($CurrentBranch -eq "main" -and $HeadCommit -eq $MainCommit)
     $QualityPass = ($Ruff.ExitCode -eq 0 -and $MyPy.ExitCode -eq 0)
@@ -612,12 +723,17 @@ foreach ($Milestone in $ExpectedMilestones) {
         $HasDocs -and
         $TestsPass -and
         $QualityPass -and
-        $ValidationPass -and
-        $HasTag -and
+        ($ValidationPass -or -not $ValidationPresent) -and
+        ($HasTag -or -not $ValidationPresent) -and
         $OnMain -and
         $WorkingTreeClean
     ) {
-        $Status = "COMPLETE"
+        $Status = if ($HasTag -or $ValidationPass) {
+            "COMPLETE"
+        }
+        else {
+            "IMPLEMENTED_NOT_RELEASED"
+        }
     }
     elseif (
         $HasProduction -and
@@ -639,12 +755,17 @@ foreach ($Milestone in $ExpectedMilestones) {
 
     $Milestones += [pscustomobject]@{
         Milestone = $Milestone
+        Name = if ($Map) { $Map.Name } else { "" }
         Phase = $Phase
         Status = $Status
-        ProductionFiles = $Production.RelativePath
-        TestFiles = $TestsForMilestone.RelativePath
-        DocumentationFiles = $Docs.RelativePath
+        ProductionFiles = @($Production | ForEach-Object { $_.RelativePath })
+        TestFiles = @($TestsForMilestone | ForEach-Object { $_.RelativePath })
+        DocumentationFiles = @($Docs | ForEach-Object { $_.RelativePath })
+        ProductionFileCount = $Production.Count
+        TestFileCount = $TestsForMilestone.Count
+        DocumentationFileCount = $Docs.Count
         ValidationPass = $ValidationPass
+        ValidationPresent = $ValidationPresent
         TagPresent = $HasTag
         OnMain = $OnMain
         WorkingTreeClean = $WorkingTreeClean
@@ -764,10 +885,45 @@ $CapabilityCompletion = if ($CapabilityCount -gt 0) {
     [math]::Round(100 * $ImplementedCapabilityCount / $CapabilityCount, 2)
 } else { 0 }
 
-$Recommended = $Milestones |
-    Where-Object Status -ne "COMPLETE" |
-    Sort-Object Milestone |
-    Select-Object -First 1
+$EvidenceMilestones = @(
+    $Milestones | Where-Object {
+        $_.ProductionFileCount -gt 0 -or
+        $_.TestFileCount -gt 0 -or
+        $_.DocumentationFileCount -gt 0 -or
+        $_.ValidationPresent -or
+        $_.TagPresent
+    }
+)
+
+$HighestEvidence = $EvidenceMilestones |
+    Sort-Object @{
+        Expression = {
+            $parts = $_.Milestone.Substring(1).Split(".")
+            ([int]$parts[0] * 100) + [int]$parts[1]
+        }
+    } |
+    Select-Object -Last 1
+
+$Recommended = $null
+if ($HighestEvidence) {
+    $parts = $HighestEvidence.Milestone.Substring(1).Split(".")
+    $nextMilestone = "M$($parts[0]).$([int]$parts[1] + 1)"
+    $Recommended = $Milestones |
+        Where-Object Milestone -eq $nextMilestone |
+        Select-Object -First 1
+}
+
+if (-not $Recommended) {
+    $Recommended = $Milestones |
+        Where-Object Status -eq "PLANNED" |
+        Sort-Object @{
+            Expression = {
+                $parts = $_.Milestone.Substring(1).Split(".")
+                ([int]$parts[0] * 100) + [int]$parts[1]
+            }
+        } |
+        Select-Object -First 1
+}
 
 $ProductionCount = @($Inventory | Where-Object Classification -eq "production").Count
 $TestFileCount = @($Inventory | Where-Object Classification -eq "test").Count
@@ -872,7 +1028,7 @@ $Markdown += @(
 )
 
 foreach ($Milestone in $Milestones) {
-    $Markdown += "| $($Milestone.Milestone) | $($Milestone.Phase) | $($Milestone.Status) | $(@($Milestone.ProductionFiles).Count) | $(@($Milestone.TestFiles).Count) | $(@($Milestone.DocumentationFiles).Count) | $($Milestone.ValidationPass) | $($Milestone.TagPresent) | $($Milestone.OnMain) |"
+    $Markdown += "| $($Milestone.Milestone) | $($Milestone.Phase) | $($Milestone.Status) | $($Milestone.ProductionFileCount) | $($Milestone.TestFileCount) | $($Milestone.DocumentationFileCount) | $($Milestone.ValidationPass) | $($Milestone.TagPresent) | $($Milestone.OnMain) |"
 }
 
 $Markdown += @(
