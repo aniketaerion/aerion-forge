@@ -44,13 +44,18 @@ def _validate_range(content: str, operation: EditOperation) -> None:
         )
 
 
-def apply_operations(
+def _normalize_newlines(value: str, newline: str) -> str:
+    normalized = value.replace("\r\n", "\n").replace("\r", "\n")
+    return normalized.replace("\n", newline)
+
+
+def apply_operations_to_content(
     loaded: LoadedTextFile,
     operations: tuple[EditOperation, ...],
-) -> FileEditResult:
-    """Apply validated edits in memory and return a deterministic diff."""
+) -> tuple[str, FileEditResult]:
+    """Apply validated edits in memory and return content plus evidence."""
     if not operations:
-        return FileEditResult(
+        return loaded.content, FileEditResult(
             relative_path=loaded.relative_path,
             original_fingerprint=loaded.fingerprint,
             resulting_fingerprint=loaded.fingerprint,
@@ -71,16 +76,17 @@ def apply_operations(
         key=lambda item: (item.start_offset, item.end_offset),
         reverse=True,
     ):
+        replacement = _normalize_newlines(operation.replacement_text, loaded.newline)
         if operation.operation_type is EditOperationType.INSERT:
             updated = (
                 updated[: operation.start_offset]
-                + operation.replacement_text
+                + replacement
                 + updated[operation.start_offset :]
             )
         elif operation.operation_type is EditOperationType.REPLACE:
             updated = (
                 updated[: operation.start_offset]
-                + operation.replacement_text
+                + replacement
                 + updated[operation.end_offset :]
             )
         else:
@@ -94,11 +100,20 @@ def apply_operations(
             tofile=f"b/{loaded.relative_path}",
         )
     )
-    resulting_fingerprint = source_fingerprint(updated)
-    return FileEditResult(
+    result = FileEditResult(
         relative_path=loaded.relative_path,
         original_fingerprint=loaded.fingerprint,
-        resulting_fingerprint=resulting_fingerprint,
+        resulting_fingerprint=source_fingerprint(updated),
         unified_diff=diff,
         changed=updated != loaded.content,
     )
+    return updated, result
+
+
+def apply_operations(
+    loaded: LoadedTextFile,
+    operations: tuple[EditOperation, ...],
+) -> FileEditResult:
+    """Apply validated edits in memory and return deterministic evidence."""
+    _, result = apply_operations_to_content(loaded, operations)
+    return result
