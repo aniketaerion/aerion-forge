@@ -79,6 +79,7 @@ from forge.safe_change_planning.cli import safe_change_app
 from forge.safe_code_editing.cli import edit_app
 from forge.tasks.cli import task_app
 from forge.tools import FilesystemTool, GitTool, OllamaTool
+from forge.validation_repair.cli import repair_app
 from forge.workspace.cli import workspace_app
 from forge.workspace.errors import WorkspaceError, WorkspaceNotFoundError
 from forge.workspace.manager import WorkspaceManager
@@ -98,6 +99,7 @@ app.add_typer(memory_app, name="memory")
 app.add_typer(report_app, name="report")
 app.add_typer(execution_app, name="execution")
 app.add_typer(safe_change_app, name="safe-change")
+app.add_typer(repair_app, name="repair")
 app.add_typer(edit_app, name="edit")
 
 
