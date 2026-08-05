@@ -656,6 +656,27 @@ $MilestoneMap = @{
         TestRegex = '^tests[\\/].*safe_change_planning'
         DocumentationRegex = '^docs[\\/]safe_change_planning[\\/]'
     }
+
+    "M3.3" = @{
+        Name = "Safe Code Editing"
+        ProductionRegex = '^forge[\\/]safe_code_editing[\\/]'
+        TestRegex = '^tests[\\/]test_safe_code_editing_.*\.py$'
+        DocumentationRegex = '^docs[\\/]safe_code_editing[\\/]'
+    }
+
+    "M3.4" = @{
+        Name = "Validation and Repair Planning"
+        ProductionRegex = '^forge[\\/]validation_repair[\\/]'
+        TestRegex = '^tests[\\/]test_validation_repair_.*\.py$'
+        DocumentationRegex = '^docs[\\/]validation_repair[\\/]'
+    }
+
+    "M3.5" = @{
+        Name = "Autonomous Repair"
+        ProductionRegex = '^forge[\\/]autonomous_repair[\\/]'
+        TestRegex = '^tests[\\/]test_autonomous_repair_.*\.py$'
+        DocumentationRegex = '^docs[\\/]autonomous_repair[\\/]'
+    }
 }
 
 $Milestones = @()
