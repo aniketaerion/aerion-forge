@@ -690,6 +690,13 @@ $MilestoneMap = @{
         TestRegex = '^tests[\\/]test_mission_orchestration_.*\.py$'
         DocumentationRegex = '^docs[\\/]mission_orchestration[\\/]'
     }
+
+    "M3.7" = @{
+        Name = "Build Verification and Release Gate"
+        ProductionRegex = '^forge[\\/]build_verification[\\/]'
+        TestRegex = '^tests[\\/]test_build_verification_.*\.py$'
+        DocumentationRegex = '^docs[\\/]build_verification[\\/]'
+    }
 }
 
 $Milestones = @()
