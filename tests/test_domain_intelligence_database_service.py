@@ -3,6 +3,7 @@ from pathlib import Path
 from forge.domain_intelligence.database.models import (
     DatabaseAnalysisRequest,
     DatabaseEngine,
+    DatabaseObjectKind,
 )
 from forge.domain_intelligence.database.service import (
     DatabaseIntelligenceService,
@@ -14,7 +15,7 @@ def initialize_repository(tmp_path: Path) -> None:
     (tmp_path / ".git").mkdir()
 
 
-def test_default_database_registry() -> None:
+def test_default_database_registry_is_complete() -> None:
     assert default_database_registry().names() == (
         "configuration",
         "discovery",
@@ -22,7 +23,7 @@ def test_default_database_registry() -> None:
     )
 
 
-def test_service_discovers_postgresql_project(
+def test_service_runs_complete_database_pipeline(
     tmp_path: Path,
 ) -> None:
     initialize_repository(tmp_path)
@@ -35,11 +36,28 @@ def test_service_discovers_postgresql_project(
         encoding="utf-8",
     )
     (tmp_path / "schema.sql").write_text(
-        "CREATE TABLE orders(id uuid);",
+        """
+        CREATE TABLE public.customers (
+            id uuid NOT NULL,
+            PRIMARY KEY (id)
+        );
+
+        CREATE TABLE public.orders (
+            id uuid NOT NULL,
+            customer_id uuid NOT NULL,
+            PRIMARY KEY (id),
+            CONSTRAINT orders_customer_fkey
+                FOREIGN KEY (customer_id)
+                REFERENCES public.customers(id)
+        );
+
+        CREATE INDEX orders_customer_idx
+        ON public.orders (customer_id);
+        """,
         encoding="utf-8",
     )
     (migrations / "001_create_orders.sql").write_text(
-        "CREATE TABLE orders(id uuid);",
+        "CREATE TABLE audit_log(id uuid);",
         encoding="utf-8",
     )
 
@@ -52,11 +70,21 @@ def test_service_discovers_postgresql_project(
     assert report.project.engines == (
         DatabaseEngine.POSTGRESQL,
     )
-    assert report.project.schema_files == (
-        "schema.sql",
+    assert len(report.tables) == 2
+
+    orders = next(
+        table
+        for table in report.tables
+        if table.name == "orders"
     )
-    assert report.project.migration_files == (
-        "migrations/001_create_orders.sql",
+
+    assert any(
+        constraint.kind is DatabaseObjectKind.FOREIGN_KEY
+        for constraint in orders.constraints
+    )
+    assert any(
+        index.name == "orders_customer_idx"
+        for index in orders.indexes
     )
 
 
@@ -74,3 +102,4 @@ def test_service_reports_unknown_database(
     assert report.project.engines == (
         DatabaseEngine.UNKNOWN,
     )
+    assert not report.tables
