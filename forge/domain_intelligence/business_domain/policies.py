@@ -1,0 +1,67 @@
+"""Safety policies for M4.5 Business Domain Intelligence."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from forge.domain_intelligence.business_domain.errors import (
+    BusinessDomainPolicyError,
+)
+from forge.domain_intelligence.business_domain.models import (
+    BusinessDomainAnalysisRequest,
+)
+
+
+class BusinessDomainIntelligencePolicy(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    allow_network: bool = False
+    allow_database_connections: bool = False
+    allow_external_ontology_fetch: bool = False
+    allow_secret_inspection: bool = False
+    allow_mutation: bool = False
+    require_repository_root: bool = True
+    max_files: int = Field(default=10000, ge=1, le=100000)
+    max_file_bytes: int = Field(
+        default=5_000_000,
+        ge=1,
+        le=100_000_000,
+    )
+
+
+def resolve_business_domain_repository_root(
+    repository_root: str | Path,
+    policy: BusinessDomainIntelligencePolicy,
+) -> Path:
+    root = Path(repository_root).expanduser().resolve()
+
+    if not root.is_dir():
+        raise BusinessDomainPolicyError(
+            f"repository root does not exist: {root}"
+        )
+
+    if policy.require_repository_root and not (root / ".git").exists():
+        raise BusinessDomainPolicyError(
+            f"repository root is not a Git repository: {root}"
+        )
+
+    return root
+
+
+def validate_business_domain_request(
+    request: BusinessDomainAnalysisRequest,
+    policy: BusinessDomainIntelligencePolicy,
+) -> None:
+    if request.max_files > policy.max_files:
+        raise BusinessDomainPolicyError(
+            f"request exceeds maximum file count: {policy.max_files}"
+        )
+
+    project_root = Path(request.project_root)
+
+    if project_root.is_absolute() or ".." in project_root.parts:
+        raise BusinessDomainPolicyError(
+            "project root must remain repository-relative"
+        )
