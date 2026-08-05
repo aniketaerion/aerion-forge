@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 from forge import __version__
+from forge.agent_runtime.cli import agent_app
 from forge.agents import RepositoryAuditAgent
 from forge.autonomous_repair.cli import autonomous_repair_app
 from forge.build_verification.cli import build_verification_app
@@ -92,6 +93,8 @@ app = typer.Typer(
     help="Local multi-workspace engineering platform (Version 0.2).",
     no_args_is_help=True,
 )
+
+app.add_typer(agent_app, name="agent")
 console = Console()
 app.add_typer(workspace_app, name="workspace")
 app.add_typer(config_app, name="config")
