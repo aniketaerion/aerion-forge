@@ -238,7 +238,13 @@ foreach ($RootFile in @("pyproject.toml", "README.md", ".gitignore")) {
 $Inventory | Sort-Object RelativePath |
     Export-Csv $FileCsv -NoTypeInformation -Encoding utf8
 
-$EmptyFiles = @($Inventory | Where-Object { -not $_.NonEmpty })
+$EmptyFiles = @(
+    $Inventory |
+    Where-Object {
+        -not $_.NonEmpty -and
+        [IO.Path]::GetFileName($_.RelativePath) -ne "__init__.py"
+    }
+)
 foreach ($File in $EmptyFiles) {
     $Findings.Add([pscustomobject]@{
         Severity = "MEDIUM"
