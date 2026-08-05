@@ -1,7 +1,15 @@
-"""Frontend project discovery service for M4.1."""
+"""Frontend project analysis service for M4.1."""
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from forge.domain_intelligence.frontend.components import (
+    component_findings,
+)
+from forge.domain_intelligence.frontend.hooks import (
+    hook_findings,
+)
 from forge.domain_intelligence.frontend.nextjs import (
     detect_nextjs,
     nextjs_findings,
@@ -13,6 +21,15 @@ from forge.domain_intelligence.frontend.react import (
 )
 from forge.domain_intelligence.frontend.registry import (
     FrontendAnalyzerRegistry,
+)
+from forge.domain_intelligence.frontend.routing import (
+    route_findings,
+)
+from forge.domain_intelligence.frontend.state_management import (
+    state_management_findings,
+)
+from forge.domain_intelligence.frontend.styling import (
+    styling_findings,
 )
 from forge.domain_intelligence.frontend.vite import (
     detect_vite,
@@ -36,17 +53,26 @@ from forge.domain_intelligence.policies import (
 
 
 def default_frontend_registry() -> FrontendAnalyzerRegistry:
+    """Return the complete M4.1 analyzer registry."""
     return FrontendAnalyzerRegistry(
         (
+            ("components", component_findings),
+            ("hooks", hook_findings),
             ("nextjs", nextjs_findings),
             ("react", react_findings),
+            ("routing", route_findings),
+            (
+                "state-management",
+                state_management_findings,
+            ),
+            ("styling", styling_findings),
             ("vite", vite_findings),
         )
     )
 
 
 class FrontendIntelligenceService:
-    """Discover and classify frontend projects safely."""
+    """Discover, classify, analyze, and report frontend projects."""
 
     def __init__(
         self,
@@ -56,10 +82,11 @@ class FrontendIntelligenceService:
         self.policy = policy or DomainIntelligencePolicy()
         self.registry = registry or default_frontend_registry()
 
-    def analyze(
+    def resolve_project_root(
         self,
         request: FrontendAnalysisRequest,
-    ) -> FrontendAnalysisReport:
+    ) -> tuple[Path, Path]:
+        """Resolve repository and project roots safely."""
         validate_frontend_request(request, self.policy)
 
         repository_root = resolve_repository_root(
@@ -76,6 +103,15 @@ class FrontendIntelligenceService:
             raise ValueError(
                 "resolved frontend project root escaped repository"
             ) from exc
+
+        return repository_root, project_root
+
+    def analyze(
+        self,
+        request: FrontendAnalysisRequest,
+    ) -> FrontendAnalysisReport:
+        """Run the complete M4.1 frontend-analysis pipeline."""
+        _, project_root = self.resolve_project_root(request)
 
         package_json = load_package_json(project_root)
         frameworks = {
@@ -106,6 +142,8 @@ class FrontendIntelligenceService:
             "next.config.ts",
             "tsconfig.json",
             "jsconfig.json",
+            "tailwind.config.js",
+            "tailwind.config.ts",
         )
         configuration_files = tuple(
             name
@@ -115,8 +153,37 @@ class FrontendIntelligenceService:
 
         source_directories = tuple(
             name
-            for name in ("src", "app", "pages", "components")
+            for name in (
+                "src",
+                "app",
+                "pages",
+                "components",
+            )
             if (project_root / name).is_dir()
+        )
+
+        findings = self.registry.analyze(project_root)
+
+        route_files = tuple(
+            sorted(
+                {
+                    finding.path
+                    for finding in findings
+                    if finding.category == "routing"
+                    and finding.path is not None
+                }
+            )
+        )
+
+        component_files = tuple(
+            sorted(
+                {
+                    finding.path
+                    for finding in findings
+                    if finding.category == "component"
+                    and finding.path is not None
+                }
+            )
         )
 
         project_payload = {
@@ -125,6 +192,10 @@ class FrontendIntelligenceService:
                 framework.value for framework in frameworks
             ),
             "package_manager": package_manager,
+            "source_directories": source_directories,
+            "configuration_files": configuration_files,
+            "route_files": route_files,
+            "component_files": component_files,
         }
 
         project = FrontendProject(
@@ -139,10 +210,10 @@ class FrontendIntelligenceService:
             or (FrontendFramework.UNKNOWN,),
             package_manager=package_manager,
             source_directories=source_directories,
+            route_files=route_files,
+            component_files=component_files,
             configuration_files=configuration_files,
         )
-
-        findings = self.registry.analyze(project_root)
 
         return FrontendAnalysisReport(
             report_id=frontend_report_identifier(
