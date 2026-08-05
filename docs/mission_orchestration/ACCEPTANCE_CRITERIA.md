@@ -1,0 +1,3 @@
+# M3.6 Acceptance Criteria
+
+M3.6 is complete when workflow ordering is deterministic, invalid dependencies are rejected, stages are registered deterministically, missions checkpoint after each stage, execution can pause and resume safely, approval gates block mutation, M3.1–M3.5 are invoked through adapters, validation failure can route to autonomous repair, repository drift blocks resume, and CLI and validators pass.

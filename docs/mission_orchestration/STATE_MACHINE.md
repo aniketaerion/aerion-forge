@@ -1,0 +1,23 @@
+# M3.6 State Machine
+
+Primary path:
+
+`CREATED → VALIDATED → PLANNED → READY → RUNNING → COMPLETED`
+
+Approval path:
+
+`RUNNING → AWAITING_APPROVAL → RUNNING`
+
+Recovery path:
+
+`RUNNING → PAUSED → RESUMING → RUNNING`
+
+Repair path:
+
+`RUNNING → REPAIRING → RUNNING`
+
+Terminal states:
+
+- `COMPLETED`
+- `CANCELLED`
+- `FAILED`
