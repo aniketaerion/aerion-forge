@@ -647,7 +647,7 @@ $MilestoneMap = @{
     "M3.1" = @{
         Name = "Execution Controller"
         ProductionRegex = '^forge[\\/]execution_controller[\\/]'
-        TestRegex = '^tests[\\/]execution_controller[\\/]'
+        TestRegex = '^tests[\\/]test_execution_controller_.*\.py$'
         DocumentationRegex = '^docs[\\/]execution_controller[\\/]'
     }
     "M3.2" = @{
