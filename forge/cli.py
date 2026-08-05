@@ -51,6 +51,7 @@ from forge.diagnostics.errors import (
 )
 from forge.diagnostics.models import DiagnosticCategory, DiagnosticConfiguration, HealthStatus
 from forge.discovery import DiscoveryError, DiscoveryService
+from forge.domain_intelligence.frontend.cli import frontend_app
 from forge.engineering_memory.cli import memory_app
 from forge.execution_controller.cli import execution_app
 from forge.impact.cli import impact_app
@@ -112,6 +113,7 @@ app.add_typer(build_verification_app, name="verify-build")
 app.add_typer(edit_app, name="edit")
 
 
+app.add_typer(frontend_app, name="frontend")
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
     configuration = CapabilityRegistryConfiguration(
         enabled=settings.capability_registry_enabled,
