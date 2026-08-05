@@ -4,6 +4,9 @@ from forge.domain_intelligence.business_domain.models import (
     BusinessDomainAnalysisRequest,
     BusinessDomainKind,
 )
+from forge.domain_intelligence.business_domain.reporting import (
+    business_domain_report_summary,
+)
 from forge.domain_intelligence.business_domain.service import (
     BusinessDomainIntelligenceService,
     default_business_domain_registry,
@@ -21,7 +24,7 @@ def test_default_business_domain_registry() -> None:
     )
 
 
-def test_service_discovers_workflows_and_rules(
+def test_service_builds_complete_business_report(
     tmp_path: Path,
 ) -> None:
     initialize_repository(tmp_path)
@@ -42,15 +45,16 @@ def test_service_discovers_workflows_and_rules(
             repository_root=str(tmp_path),
         )
     )
+    summary = business_domain_report_summary(report)
 
     assert report.project.domains == (
         BusinessDomainKind.ERP,
     )
+    assert report.entities
     assert report.workflows
     assert report.rules
-    assert {
-        rule.name for rule in report.rules
-    } == {"Purchase Order Requires Approval"}
+    assert summary["entity_count"] == 1
+    assert summary["workflow_count"] == 1
 
 
 def test_service_reports_unknown_domain(
@@ -67,5 +71,6 @@ def test_service_reports_unknown_domain(
     assert report.project.domains == (
         BusinessDomainKind.UNKNOWN,
     )
+    assert not report.entities
     assert not report.workflows
     assert not report.rules
