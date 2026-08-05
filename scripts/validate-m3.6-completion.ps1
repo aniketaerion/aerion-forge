@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "M3.6 architecture validation failed."
 }
 
-forge orchestrate --help | Out-Null
+python -c "from typer.testing import CliRunner; from forge.cli import app; result = CliRunner().invoke(app, ['orchestrate', '--help']); print(result.stdout); raise SystemExit(result.exit_code)" | Out-Null
 if ($LASTEXITCODE -ne 0) {
     throw "M3.6 CLI verification failed."
 }

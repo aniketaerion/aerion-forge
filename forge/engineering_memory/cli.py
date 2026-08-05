@@ -161,12 +161,10 @@ def _error_exit_code(
 ) -> int:
     if isinstance(
         exc,
-        (
-            EngineeringMemoryNotFoundError,
-            MissionNotFoundError,
-            TaskNotFoundError,
-            ImpactDecisionNotFoundError,
-        ),
+        EngineeringMemoryNotFoundError
+        | MissionNotFoundError
+        | TaskNotFoundError
+        | ImpactDecisionNotFoundError,
     ):
         return 2
 
@@ -175,12 +173,10 @@ def _error_exit_code(
 
     if isinstance(
         exc,
-        (
-            EngineeringMemoryPersistenceError,
-            EngineeringMemoryStoreCorruptionError,
-            EngineeringMemorySchemaMismatchError,
-            EngineeringMemoryReportError,
-        ),
+        EngineeringMemoryPersistenceError
+        | EngineeringMemoryStoreCorruptionError
+        | EngineeringMemorySchemaMismatchError
+        | EngineeringMemoryReportError,
     ):
         return 4
 

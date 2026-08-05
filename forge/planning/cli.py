@@ -59,10 +59,7 @@ def _service(settings: Settings) -> MissionPlanningService:
 def _error_exit_code(exc: MissionPlanningError) -> int:
     if isinstance(
         exc,
-        (
-            MissionRequestError,
-            MissionTargetNotFoundError,
-        ),
+        MissionRequestError | MissionTargetNotFoundError,
     ):
         return 2
 

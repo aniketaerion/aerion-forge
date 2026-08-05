@@ -391,7 +391,7 @@ class RepositoryScanner:
             return findings
 
         for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 body = list(node.body)
                 if (
                     body

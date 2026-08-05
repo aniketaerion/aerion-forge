@@ -137,11 +137,7 @@ def _error_exit_code(
 ) -> int:
     if isinstance(
         exc,
-        (
-            MissionNotFoundError,
-            TaskNotFoundError,
-            ImpactDecisionNotFoundError,
-        ),
+        MissionNotFoundError | TaskNotFoundError | ImpactDecisionNotFoundError,
     ):
         return 2
 
@@ -150,12 +146,10 @@ def _error_exit_code(
 
     if isinstance(
         exc,
-        (
-            ImpactPersistenceError,
-            ImpactStoreCorruptionError,
-            ImpactSchemaMismatchError,
-            ImpactReportError,
-        ),
+        ImpactPersistenceError
+        | ImpactStoreCorruptionError
+        | ImpactSchemaMismatchError
+        | ImpactReportError,
     ):
         return 4
 

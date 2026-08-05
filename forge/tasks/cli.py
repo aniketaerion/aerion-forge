@@ -97,11 +97,7 @@ def _error_exit_code(
 ) -> int:
     if isinstance(
         exc,
-        (
-            MissionNotFoundError,
-            TaskNotFoundError,
-            TaskDefinitionError,
-        ),
+        MissionNotFoundError | TaskNotFoundError | TaskDefinitionError,
     ):
         return 2
 

@@ -64,10 +64,7 @@ def _exit_code(exc: SafeChangePlanningError) -> int:
 
     if isinstance(
         exc,
-        (
-            ChangePlanningPersistenceError,
-            ChangePlanningReportError,
-        ),
+        ChangePlanningPersistenceError | ChangePlanningReportError,
     ):
         return 4
 
