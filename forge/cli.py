@@ -52,6 +52,7 @@ from forge.diagnostics.errors import (
 from forge.diagnostics.models import DiagnosticCategory, DiagnosticConfiguration, HealthStatus
 from forge.discovery import DiscoveryError, DiscoveryService
 from forge.domain_intelligence.backend.cli import backend_app
+from forge.domain_intelligence.database.cli import database_app
 from forge.domain_intelligence.frontend.cli import frontend_app
 from forge.engineering_memory.cli import memory_app
 from forge.execution_controller.cli import execution_app
@@ -116,6 +117,7 @@ app.add_typer(edit_app, name="edit")
 
 app.add_typer(frontend_app, name="frontend")
 app.add_typer(backend_app, name="backend")
+app.add_typer(database_app, name="database")
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
     configuration = CapabilityRegistryConfiguration(
         enabled=settings.capability_registry_enabled,
