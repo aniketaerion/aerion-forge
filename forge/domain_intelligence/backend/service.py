@@ -1,7 +1,17 @@
-"""Backend discovery service for M4.2."""
+"""Complete backend analysis service for M4.2."""
 
 from __future__ import annotations
 
+from forge.domain_intelligence.backend.architecture import (
+    architecture_findings,
+)
+from forge.domain_intelligence.backend.configuration import (
+    configuration_findings,
+    discover_configuration_files,
+)
+from forge.domain_intelligence.backend.dependencies import (
+    dependency_findings,
+)
 from forge.domain_intelligence.backend.django import (
     detect_django,
     django_findings,
@@ -35,21 +45,34 @@ from forge.domain_intelligence.backend.policies import (
 from forge.domain_intelligence.backend.registry import (
     BackendAnalyzerRegistry,
 )
+from forge.domain_intelligence.backend.services import (
+    discover_service_files,
+    service_findings,
+)
+from forge.domain_intelligence.backend.workers import (
+    discover_worker_files,
+    worker_findings,
+)
 
 
 def default_backend_registry() -> BackendAnalyzerRegistry:
-    """Return the M4.2 Package 1 analyzer registry."""
+    """Return the complete M4.2 backend analyzer registry."""
     return BackendAnalyzerRegistry(
         (
+            ("architecture", architecture_findings),
+            ("configuration", configuration_findings),
+            ("dependencies", dependency_findings),
             ("django", django_findings),
             ("fastapi", fastapi_findings),
             ("node", node_findings),
+            ("services", service_findings),
+            ("workers", worker_findings),
         )
     )
 
 
 class BackendIntelligenceService:
-    """Discover backend runtime and framework metadata safely."""
+    """Discover, classify, and report backend architecture."""
 
     def __init__(
         self,
@@ -63,7 +86,7 @@ class BackendIntelligenceService:
         self,
         request: BackendAnalysisRequest,
     ) -> BackendAnalysisReport:
-        """Run backend framework discovery."""
+        """Run the complete M4.2 backend-analysis pipeline."""
         validate_backend_request(request, self.policy)
 
         repository_root = resolve_backend_repository_root(
@@ -123,23 +146,6 @@ class BackendIntelligenceService:
             value = str(package_json["packageManager"])
             package_manager = value.split("@", maxsplit=1)[0]
 
-        configuration_names = (
-            "package.json",
-            "package-lock.json",
-            "pnpm-lock.yaml",
-            "yarn.lock",
-            "requirements.txt",
-            "pyproject.toml",
-            "Pipfile",
-            "poetry.lock",
-            "manage.py",
-        )
-        configuration_files = tuple(
-            name
-            for name in configuration_names
-            if (project_root / name).is_file()
-        )
-
         source_directories = tuple(
             name
             for name in (
@@ -153,6 +159,11 @@ class BackendIntelligenceService:
             if (project_root / name).is_dir()
         )
 
+        configuration_files = discover_configuration_files(
+            project_root
+        )
+        service_files = discover_service_files(project_root)
+        worker_files = discover_worker_files(project_root)
         findings = self.registry.analyze(project_root)
 
         project_payload = {
@@ -164,6 +175,9 @@ class BackendIntelligenceService:
                 framework.value for framework in frameworks
             ),
             "package_manager": package_manager,
+            "configuration_files": configuration_files,
+            "service_files": service_files,
+            "worker_files": worker_files,
         }
 
         project = BackendProject(
@@ -188,6 +202,8 @@ class BackendIntelligenceService:
             package_manager=package_manager,
             source_directories=source_directories,
             configuration_files=configuration_files,
+            service_files=service_files,
+            worker_files=worker_files,
         )
 
         return BackendAnalysisReport(
