@@ -1,4 +1,4 @@
-"""Business-domain analysis service for M4.5 Package 1."""
+"""Complete business-domain analysis service for M4.5."""
 
 from __future__ import annotations
 
@@ -20,6 +20,9 @@ from forge.domain_intelligence.business_domain.models import (
     BusinessDomainAnalysisRequest,
     BusinessDomainProject,
 )
+from forge.domain_intelligence.business_domain.ontology import (
+    build_business_ontology,
+)
 from forge.domain_intelligence.business_domain.policies import (
     BusinessDomainIntelligencePolicy,
     resolve_business_domain_repository_root,
@@ -28,12 +31,18 @@ from forge.domain_intelligence.business_domain.policies import (
 from forge.domain_intelligence.business_domain.registry import (
     BusinessDomainAnalyzerRegistry,
 )
+from forge.domain_intelligence.business_domain.rules import (
+    infer_business_rules,
+)
+from forge.domain_intelligence.business_domain.workflows import (
+    discover_business_workflows,
+)
 
 
 def default_business_domain_registry() -> (
     BusinessDomainAnalyzerRegistry
 ):
-    """Return the M4.5 Package 1 analyzer registry."""
+    """Return the M4.5 analyzer registry."""
     return BusinessDomainAnalyzerRegistry(
         (
             ("crm", crm_findings),
@@ -43,7 +52,7 @@ def default_business_domain_registry() -> (
 
 
 class BusinessDomainIntelligenceService:
-    """Discover business domains, modules, and entities safely."""
+    """Discover and analyze business-domain architecture."""
 
     def __init__(
         self,
@@ -61,6 +70,7 @@ class BusinessDomainIntelligenceService:
         self,
         request: BusinessDomainAnalysisRequest,
     ) -> BusinessDomainAnalysisReport:
+        """Run the M4.5 business-domain analysis pipeline."""
         validate_business_domain_request(
             request,
             self.policy,
@@ -99,6 +109,13 @@ class BusinessDomainIntelligenceService:
             )
         )
 
+        ontology = build_business_ontology(entities)
+        workflows = discover_business_workflows(
+            project_root,
+            modules,
+        )
+        rules = infer_business_rules(entities)
+
         project_payload = {
             "root": request.project_root,
             "domains": [
@@ -106,6 +123,7 @@ class BusinessDomainIntelligenceService:
             ],
             "modules": modules,
             "source_files": source_files,
+            "ontology": ontology,
         }
 
         project = BusinessDomainProject(
@@ -128,6 +146,13 @@ class BusinessDomainIntelligenceService:
                         entity.entity_id
                         for entity in entities
                     ],
+                    "workflow_ids": [
+                        workflow.workflow_id
+                        for workflow in workflows
+                    ],
+                    "rule_ids": [
+                        rule.rule_id for rule in rules
+                    ],
                     "finding_ids": [
                         finding.finding_id
                         for finding in findings
@@ -136,5 +161,7 @@ class BusinessDomainIntelligenceService:
             ),
             project=project,
             entities=entities,
+            workflows=workflows,
+            rules=rules,
             findings=findings,
         )
