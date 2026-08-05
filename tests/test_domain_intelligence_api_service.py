@@ -14,19 +14,32 @@ def initialize_repository(tmp_path: Path) -> None:
     (tmp_path / ".git").mkdir()
 
 
-def test_default_api_registry() -> None:
+def test_default_api_registry_is_complete() -> None:
     assert default_api_registry().names() == (
+        "dependencies",
         "discovery",
+        "graphql",
         "openapi",
         "rest",
     )
 
 
-def test_service_discovers_rest_and_openapi(
+def test_service_runs_complete_api_pipeline(
     tmp_path: Path,
 ) -> None:
     initialize_repository(tmp_path)
 
+    (tmp_path / "package.json").write_text(
+        """
+        {
+          "dependencies": {
+            "express": "^5.0.0",
+            "graphql": "^16.0.0"
+          }
+        }
+        """,
+        encoding="utf-8",
+    )
     (tmp_path / "openapi.yaml").write_text(
         """
         openapi: 3.0.0
@@ -34,8 +47,9 @@ def test_service_discovers_rest_and_openapi(
           title: ERP API
           version: 1.0.0
         paths:
-          /orders:
+          /v1/orders:
             get:
+              operationId: listOrders
               responses:
                 "200":
                   description: Success
@@ -50,6 +64,14 @@ def test_service_discovers_rest_and_openapi(
         """,
         encoding="utf-8",
     )
+    (tmp_path / "schema.graphql").write_text(
+        """
+        type Query {
+            orders: [String!]!
+        }
+        """,
+        encoding="utf-8",
+    )
 
     report = ApiIntelligenceService().analyze(
         ApiAnalysisRequest(
@@ -58,10 +80,19 @@ def test_service_discovers_rest_and_openapi(
     )
 
     assert report.project.styles == (
+        ApiStyle.GRAPHQL,
         ApiStyle.OPENAPI,
         ApiStyle.REST,
     )
-    assert len(report.contracts) == 2
+    assert len(report.contracts) == 3
+
+    categories = {
+        finding.category for finding in report.findings
+    }
+
+    assert "dependencies" in categories
+    assert "graphql" in categories
+    assert "missing_authentication" in categories
 
 
 def test_service_reports_unknown_api(
@@ -78,3 +109,4 @@ def test_service_reports_unknown_api(
     assert report.project.styles == (
         ApiStyle.UNKNOWN,
     )
+    assert not report.contracts

@@ -1,27 +1,38 @@
-"""API discovery service for M4.4 Package 1."""
+"""Complete API analysis service for M4.4."""
 
 from __future__ import annotations
 
+from forge.domain_intelligence.api.compatibility import (
+    compatibility_findings,
+)
+from forge.domain_intelligence.api.contracts import (
+    discover_api_contracts,
+)
+from forge.domain_intelligence.api.dependencies import (
+    dependency_findings,
+    discover_api_dependencies,
+)
 from forge.domain_intelligence.api.discovery import (
     discover_api_source_files,
     discovery_findings,
 )
+from forge.domain_intelligence.api.graphql import (
+    discover_graphql_files,
+    graphql_findings,
+)
 from forge.domain_intelligence.api.identifiers import (
-    api_contract_identifier,
     api_project_identifier,
     api_report_identifier,
 )
 from forge.domain_intelligence.api.models import (
     ApiAnalysisReport,
     ApiAnalysisRequest,
-    ApiContract,
     ApiProject,
     ApiStyle,
 )
 from forge.domain_intelligence.api.openapi import (
     discover_openapi_files,
     openapi_findings,
-    parse_openapi_file,
 )
 from forge.domain_intelligence.api.policies import (
     ApiIntelligencePolicy,
@@ -32,16 +43,23 @@ from forge.domain_intelligence.api.registry import (
     ApiAnalyzerRegistry,
 )
 from forge.domain_intelligence.api.rest import (
-    discover_rest_endpoints,
     rest_findings,
+)
+from forge.domain_intelligence.api.security import (
+    security_findings,
+)
+from forge.domain_intelligence.api.versioning import (
+    versioning_findings,
 )
 
 
 def default_api_registry() -> ApiAnalyzerRegistry:
-    """Return the M4.4 Package 1 analyzer registry."""
+    """Return the complete M4.4 analyzer registry."""
     return ApiAnalyzerRegistry(
         (
+            ("dependencies", dependency_findings),
             ("discovery", discovery_findings),
+            ("graphql", graphql_findings),
             ("openapi", openapi_findings),
             ("rest", rest_findings),
         )
@@ -49,7 +67,7 @@ def default_api_registry() -> ApiAnalyzerRegistry:
 
 
 class ApiIntelligenceService:
-    """Discover API contracts and source endpoints safely."""
+    """Discover, analyze, and report API architecture."""
 
     def __init__(
         self,
@@ -63,7 +81,7 @@ class ApiIntelligenceService:
         self,
         request: ApiAnalysisRequest,
     ) -> ApiAnalysisReport:
-        """Run REST and OpenAPI discovery without network calls."""
+        """Run the complete M4.4 API-analysis pipeline."""
         validate_api_request(request, self.policy)
 
         repository_root = resolve_api_repository_root(
@@ -81,48 +99,44 @@ class ApiIntelligenceService:
                 "resolved API project root escaped repository"
             ) from exc
 
-        contracts = [
-            parse_openapi_file(project_root, relative_path)
-            for relative_path in discover_openapi_files(
-                project_root
-            )
-        ]
-
-        rest_endpoints = discover_rest_endpoints(project_root)
-
-        if rest_endpoints:
-            contracts.append(
-                ApiContract(
-                    contract_id=api_contract_identifier(
-                        {
-                            "title": "Discovered REST API",
-                            "source_path": "source",
-                            "endpoint_ids": [
-                                endpoint.endpoint_id
-                                for endpoint in rest_endpoints
-                            ],
-                        }
-                    ),
-                    title="Discovered REST API",
-                    style=ApiStyle.REST,
-                    source_path="source",
-                    endpoints=rest_endpoints,
-                )
-            )
-
+        contracts = discover_api_contracts(project_root)
         styles = {
             contract.style for contract in contracts
         }
+        contract_files = discover_openapi_files(project_root)
+        source_files = discover_api_source_files(project_root)
+        graphql_files = discover_graphql_files(project_root)
+        dependencies = discover_api_dependencies(project_root)
+
+        configuration_files = tuple(
+            sorted(
+                {
+                    *contract_files,
+                    *(
+                        ("package.json",)
+                        if (project_root / "package.json").is_file()
+                        else ()
+                    ),
+                    *(
+                        ("requirements.txt",)
+                        if (
+                            project_root
+                            / "requirements.txt"
+                        ).is_file()
+                        else ()
+                    ),
+                }
+            )
+        )
 
         project_payload = {
             "root": request.project_root,
             "styles": sorted(style.value for style in styles),
-            "contract_files": discover_openapi_files(
-                project_root
-            ),
-            "source_files": discover_api_source_files(
-                project_root
-            ),
+            "contract_files": contract_files,
+            "source_files": source_files,
+            "graphql_files": graphql_files,
+            "dependencies": dependencies,
+            "configuration_files": configuration_files,
         }
 
         project = ApiProject(
@@ -135,15 +149,17 @@ class ApiIntelligenceService:
                 )
             )
             or (ApiStyle.UNKNOWN,),
-            contract_files=tuple(
-                project_payload["contract_files"]
-            ),
-            source_files=tuple(
-                project_payload["source_files"]
-            ),
+            contract_files=contract_files,
+            source_files=source_files,
+            configuration_files=configuration_files,
         )
 
-        findings = self.registry.analyze(project_root)
+        findings = (
+            *self.registry.analyze(project_root),
+            *versioning_findings(contracts),
+            *compatibility_findings(contracts),
+            *security_findings(contracts),
+        )
 
         return ApiAnalysisReport(
             report_id=api_report_identifier(
@@ -160,14 +176,11 @@ class ApiIntelligenceService:
                 }
             ),
             project=project,
-            contracts=tuple(
+            contracts=contracts,
+            findings=tuple(
                 sorted(
-                    contracts,
-                    key=lambda contract: (
-                        contract.style.value,
-                        contract.source_path,
-                    ),
+                    findings,
+                    key=lambda finding: finding.finding_id,
                 )
             ),
-            findings=findings,
         )
