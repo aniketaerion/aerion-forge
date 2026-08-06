@@ -33,6 +33,12 @@ from forge.domain_intelligence.knowledge_loader.policies import (
     resolve_knowledge_repository_root,
     validate_knowledge_request,
 )
+from forge.domain_intelligence.knowledge_loader.reporting import (
+    KnowledgeLoaderReportSummary,
+    knowledge_loader_report_markdown,
+    knowledge_loader_report_summary,
+    write_knowledge_loader_report_bundle,
+)
 
 __all__ = [
     "KnowledgeChunk",
@@ -47,6 +53,7 @@ __all__ = [
     "KnowledgeLoaderError",
     "KnowledgeLoaderPolicy",
     "KnowledgeLoaderPolicyError",
+    "KnowledgeLoaderReportSummary",
     "KnowledgeManifest",
     "KnowledgeSource",
     "KnowledgeSourceError",
@@ -55,9 +62,12 @@ __all__ = [
     "knowledge_chunk_identifier",
     "knowledge_document_identifier",
     "knowledge_finding_identifier",
+    "knowledge_loader_report_markdown",
+    "knowledge_loader_report_summary",
     "knowledge_manifest_identifier",
     "knowledge_report_identifier",
     "knowledge_source_identifier",
     "resolve_knowledge_repository_root",
     "validate_knowledge_request",
+    "write_knowledge_loader_report_bundle",
 ]
