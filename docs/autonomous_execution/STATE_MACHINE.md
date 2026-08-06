@@ -1,0 +1,36 @@
+# M5.2 Step Execution State Machine
+
+```text
+PENDING
+  -> ELIGIBILITY_CHECK
+  -> READY
+  -> LEASE_ACQUIRING
+  -> CHECKPOINT_VERIFYING
+  -> TOOL_PREPARING
+  -> TOOL_RUNNING
+  -> EFFECT_VERIFYING
+  -> EVIDENCE_RECORDING
+  -> SUCCEEDED
+```
+
+Failure and control states:
+
+```text
+BLOCKED
+AWAITING_APPROVAL
+RETRY_PENDING
+ROLLBACK_PENDING
+ROLLED_BACK
+PAUSED
+ESCALATED
+FAILED
+CANCELLED
+```
+
+Terminal execution states:
+
+- SUCCEEDED
+- FAILED
+- CANCELLED
+
+No terminal execution may resume.
