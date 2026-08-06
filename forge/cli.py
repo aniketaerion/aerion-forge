@@ -57,6 +57,7 @@ from forge.domain_intelligence.business_domain.cli import business_domain_app
 from forge.domain_intelligence.database.cli import database_app
 from forge.domain_intelligence.embedded.cli import embedded_app
 from forge.domain_intelligence.frontend.cli import frontend_app
+from forge.domain_intelligence.knowledge_loader.cli import knowledge_loader_app
 from forge.engineering_memory.cli import memory_app
 from forge.execution_controller.cli import execution_app
 from forge.impact.cli import impact_app
@@ -124,6 +125,7 @@ app.add_typer(database_app, name="database")
 app.add_typer(api_app, name="api")
 app.add_typer(business_domain_app, name="business-domain")
 app.add_typer(embedded_app, name="embedded")
+app.add_typer(knowledge_loader_app, name="knowledge-loader")
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
     configuration = CapabilityRegistryConfiguration(
         enabled=settings.capability_registry_enabled,
