@@ -1,3 +1,4 @@
+
 """Typer command-line interface for the local engineering platform."""
 
 import json
@@ -12,6 +13,7 @@ from forge import __version__
 from forge.agent_runtime.cli import agent_app
 from forge.agents import RepositoryAuditAgent
 from forge.autonomous_repair.cli import autonomous_repair_app
+from forge.autonomous_runtime.cli import app as autonomous_runtime_app
 from forge.build_verification.cli import build_verification_app
 from forge.capabilities import (
     CapabilityRegistryQuery,
@@ -309,6 +311,11 @@ def _run_diagnostic_cli(
         raise typer.Exit(code=7) from exc
 
 
+
+
+
+app.add_typer(autonomous_runtime_app, name="autonomous")
+
 @app.command()
 def health(
     json_output: Annotated[bool, typer.Option("--json")] = False,
@@ -329,6 +336,8 @@ def health(
         check_id=check_id,
         strict=strict,
     )
+
+
 
 
 @app.command()
@@ -354,6 +363,8 @@ def diagnose(
         check_id=check_id,
         strict=strict,
     )
+
+
 
 
 @app.command()
@@ -392,6 +403,8 @@ def audit(
     table.add_row("Reports", str(len(result.reports)))
     console.print(table)
     console.print(f"Reports: [green]{settings.reports_path}[/green]")
+
+
 
 
 @app.command()
@@ -461,6 +474,8 @@ def inspect(
         )
         console.print(f"[bold]CI/CD:[/bold] {', '.join(result.ci_cd) or 'None'}")
     console.print(f"Reports: [green]{settings.reports_path}[/green]")
+
+
 
 
 @app.command()
@@ -556,6 +571,8 @@ def index(
             f"[bold]Failed / skipped:[/bold] {statistics.failed_count} / {statistics.skipped_count}"
         )
     console.print(f"Reports: [green]{settings.reports_path}[/green]")
+
+
 
 
 @app.command()
@@ -677,6 +694,8 @@ def graph(
     console.print(f"Reports: [green]{settings.reports_path}[/green]")
 
 
+
+
 @app.command()
 def capabilities(
     json_output: Annotated[bool, typer.Option("--json", help="Print registry JSON.")] = False,
@@ -770,6 +789,8 @@ def capabilities(
     console.print(table)
 
 
+
+
 @app.command()
 def capability(
     capability_id: Annotated[str, typer.Argument(help="Canonical capability ID.")],
@@ -800,6 +821,8 @@ def capability(
     _print_capability_detail(definition, evaluation)
 
 
+
+
 @app.command("show-memory")
 def show_memory() -> None:
     """Print the persisted platform memory as JSON."""
@@ -808,7 +831,10 @@ def show_memory() -> None:
     console.print_json(json.dumps(memory.read(), default=str))
 
 
+
+
 @app.command()
 def version() -> None:
     """Print the installed platform version."""
     console.print(__version__)
+
