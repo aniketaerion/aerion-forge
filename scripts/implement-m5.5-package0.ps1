@@ -152,9 +152,9 @@ def _normalize(value: Any) -> Any:
                 key=lambda pair: str(pair[0]),
             )
         }
-    if isinstance(value, (list, tuple, set, frozenset)):
+    if isinstance(value, list | tuple | set | frozenset):
         items = [_normalize(item) for item in value]
-        if isinstance(value, (set, frozenset)):
+        if isinstance(value, set | frozenset):
             items = sorted(
                 items,
                 key=lambda item: json.dumps(

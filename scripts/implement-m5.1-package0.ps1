@@ -221,10 +221,10 @@ def _normalize(value: Any) -> Any:
         }
     if isinstance(value, Sequence) and not isinstance(
         value,
-        (str, bytes, bytearray),
+        str | bytes | bytearray,
     ):
         return [_normalize(item) for item in value]
-    if isinstance(value, (str, int, float, bool)) or value is None:
+    if isinstance(value, str | int | float | bool) or value is None:
         return value
 
     raise MissionIdentifierError(

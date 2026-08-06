@@ -20,9 +20,9 @@ def _normalize(value: Any) -> Any:
             )
         }
 
-    if isinstance(value, (list, tuple, set, frozenset)):
+    if isinstance(value, list | tuple | set | frozenset):
         normalized = [_normalize(item) for item in value]
-        if isinstance(value, (set, frozenset)):
+        if isinstance(value, set | frozenset):
             normalized = sorted(
                 normalized,
                 key=lambda item: json.dumps(
