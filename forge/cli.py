@@ -55,6 +55,7 @@ from forge.domain_intelligence.api.cli import api_app
 from forge.domain_intelligence.backend.cli import backend_app
 from forge.domain_intelligence.business_domain.cli import business_domain_app
 from forge.domain_intelligence.database.cli import database_app
+from forge.domain_intelligence.embedded.cli import embedded_app
 from forge.domain_intelligence.frontend.cli import frontend_app
 from forge.engineering_memory.cli import memory_app
 from forge.execution_controller.cli import execution_app
@@ -122,6 +123,7 @@ app.add_typer(backend_app, name="backend")
 app.add_typer(database_app, name="database")
 app.add_typer(api_app, name="api")
 app.add_typer(business_domain_app, name="business-domain")
+app.add_typer(embedded_app, name="embedded")
 def _capability_result(settings: Settings) -> CapabilityRegistryResult:
     configuration = CapabilityRegistryConfiguration(
         enabled=settings.capability_registry_enabled,
