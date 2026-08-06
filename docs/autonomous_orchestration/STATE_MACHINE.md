@@ -1,0 +1,45 @@
+# M5.3 Mission Orchestration State Machine
+
+```text
+CREATED
+  -> INITIALIZING
+  -> PLAN_LOADING
+  -> READY
+  -> STEP_SELECTING
+  -> STEP_PREPARING
+  -> STEP_EXECUTING
+  -> OUTCOME_PROCESSING
+  -> PROGRESS_UPDATING
+  -> CONTINUE_CHECK
+```
+
+From `CONTINUE_CHECK`, the session may transition to:
+
+```text
+STEP_SELECTING
+AWAITING_APPROVAL
+RETRY_PENDING
+ROLLBACK_PENDING
+REPLAN_PENDING
+PAUSED
+ESCALATED
+COMPLETED
+FAILED
+CANCELLED
+```
+
+Resume flow:
+
+```text
+PAUSED
+  -> RESUME_VALIDATING
+  -> READY
+```
+
+Terminal states:
+
+- COMPLETED
+- FAILED
+- CANCELLED
+
+Terminal sessions cannot resume.
