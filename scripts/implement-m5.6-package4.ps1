@@ -477,14 +477,14 @@ if (-not $CliContent.Contains($ImportLine)) {
     $AnchorPattern = (
         '(?m)^(from forge\.autonomous_[^\r\n]+\r?\n)'
     )
-    $Matches = [regex]::Matches(
+    $ImportMatches = [regex]::Matches(
         $CliContent,
         $AnchorPattern
     )
 
-    if ($Matches.Count -gt 0) {
-        $LastMatch = $Matches[
-            $Matches.Count - 1
+    if ($ImportMatches.Count -gt 0) {
+        $LastMatch = $ImportMatches[
+            $ImportMatches.Count - 1
         ]
         $InsertAt = (
             $LastMatch.Index +
