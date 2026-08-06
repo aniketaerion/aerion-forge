@@ -103,16 +103,44 @@ class InMemoryMemoryStorage:
         self,
         learning: LearningRecord,
     ) -> None:
+        """Store a new or monotonically updated learning record."""
         existing = self._learning.get(learning.learning_id)
 
-        if existing is not None and existing != learning:
+        if existing is None:
+            self._learning[learning.learning_id] = learning
+            return
+
+        if existing == learning:
+            return
+
+        identity_unchanged = (
+            existing.source_memory_ids
+            == learning.source_memory_ids
+            and existing.lesson == learning.lesson
+            and existing.applicability
+            == learning.applicability
+            and existing.created_at == learning.created_at
+        )
+        counters_are_monotonic = (
+            learning.success_count
+            >= existing.success_count
+            and learning.failure_count
+            >= existing.failure_count
+        )
+
+        if not identity_unchanged:
             raise MemoryContractError(
-                f"Conflicting learning record: "
+                "Learning update changed immutable identity fields: "
+                f"{learning.learning_id}"
+            )
+
+        if not counters_are_monotonic:
+            raise MemoryContractError(
+                "Learning feedback counters cannot decrease: "
                 f"{learning.learning_id}"
             )
 
         self._learning[learning.learning_id] = learning
-
     def all_learning(self) -> tuple[LearningRecord, ...]:
         return tuple(
             self._learning[key]
