@@ -14,4 +14,7 @@ def test_default_phase_validation_registry() -> None:
     } == {
         PhaseValidationKind.ACCEPTANCE,
         PhaseValidationKind.ARCHITECTURE,
+        PhaseValidationKind.COMPATIBILITY,
+        PhaseValidationKind.COVERAGE,
+        PhaseValidationKind.RELEASE,
     }

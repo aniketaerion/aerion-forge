@@ -43,10 +43,18 @@ class PhaseValidationService:
             self._policy,
         )
 
-        checks = self._registry.checks()
+        executable_kinds = (
+            "acceptance",
+            "architecture",
+        )
+
+        checks = self._registry.checks(
+            kinds=executable_kinds,
+        )
         results = self._registry.execute(
             repository_root,
             request.phase,
+            kinds=executable_kinds,
         )
 
         payload = {

@@ -13,9 +13,18 @@ from forge.domain_intelligence.phase_validation.architecture import (
     architecture_check,
     validate_architecture,
 )
+from forge.domain_intelligence.phase_validation.compatibility import (
+    compatibility_check,
+)
+from forge.domain_intelligence.phase_validation.coverage import (
+    coverage_check,
+)
 from forge.domain_intelligence.phase_validation.models import (
     PhaseValidationCheck,
     PhaseValidationResult,
+)
+from forge.domain_intelligence.phase_validation.release import (
+    release_check,
 )
 
 ValidationRunner = Callable[
@@ -52,6 +61,9 @@ class PhaseValidationRegistry:
             acceptance_check(),
             _run_acceptance,
         )
+        registry.register_placeholder(coverage_check())
+        registry.register_placeholder(compatibility_check())
+        registry.register_placeholder(release_check())
         return registry
 
     def register(
@@ -61,26 +73,34 @@ class PhaseValidationRegistry:
     ) -> None:
         self._entries[check.check_id] = (check, runner)
 
-    def checks(self) -> tuple[PhaseValidationCheck, ...]:
-        return tuple(
-            entry[0]
-            for _, entry in sorted(
-                self._entries.items(),
-                key=lambda item: (
-                    item[1][0].kind.value,
-                    item[1][0].name,
-                ),
+    def register_placeholder(
+        self,
+        check: PhaseValidationCheck,
+    ) -> None:
+        def _unsupported(
+            repository_root: Path,
+            phase: str,
+        ) -> PhaseValidationResult:
+            del repository_root, phase
+            raise RuntimeError(
+                f"Validation runner not configured: {check.name}"
             )
+
+        self._entries[check.check_id] = (
+            check,
+            _unsupported,
         )
 
-    def execute(
+    def checks(
         self,
-        repository_root: Path,
-        phase: str,
-    ) -> tuple[PhaseValidationResult, ...]:
+        *,
+        kinds: tuple[str, ...] = (),
+    ) -> tuple[PhaseValidationCheck, ...]:
+        requested = set(kinds)
+
         return tuple(
-            runner(repository_root, phase)
-            for _, runner in (
+            check
+            for check, _ in (
                 entry
                 for _, entry in sorted(
                     self._entries.items(),
@@ -90,4 +110,29 @@ class PhaseValidationRegistry:
                     ),
                 )
             )
+            if not requested or check.kind.value in requested
+        )
+
+    def execute(
+        self,
+        repository_root: Path,
+        phase: str,
+        *,
+        kinds: tuple[str, ...] = (),
+    ) -> tuple[PhaseValidationResult, ...]:
+        requested = set(kinds)
+
+        return tuple(
+            runner(repository_root, phase)
+            for check, runner in (
+                entry
+                for _, entry in sorted(
+                    self._entries.items(),
+                    key=lambda item: (
+                        item[1][0].kind.value,
+                        item[1][0].name,
+                    ),
+                )
+            )
+            if not requested or check.kind.value in requested
         )
