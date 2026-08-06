@@ -14,6 +14,7 @@ from forge.agent_runtime.cli import agent_app
 from forge.agents import RepositoryAuditAgent
 from forge.autonomous_decision.cli import app as autonomous_decision_app
 from forge.autonomous_execution.cli import app as autonomous_execution_app
+from forge.autonomous_execution_v2.cli import app as autonomous_execution_v2_app
 from forge.autonomous_memory.cli import app as autonomous_memory_app
 from forge.autonomous_orchestration.cli import app as autonomous_orchestration_app
 from forge.autonomous_planning.cli import app as autonomous_planning_app
@@ -850,3 +851,4 @@ def version() -> None:
     console.print(__version__)
 app.add_typer(autonomous_memory_app, name="autonomous-memory")
 app.add_typer(autonomous_planning_app, name="autonomous-planning")
+app.add_typer(autonomous_execution_v2_app, name="autonomous-execution-v2")
