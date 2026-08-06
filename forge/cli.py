@@ -12,6 +12,7 @@ from rich.table import Table
 from forge import __version__
 from forge.agent_runtime.cli import agent_app
 from forge.agents import RepositoryAuditAgent
+from forge.autonomous_decision.cli import app as autonomous_decision_app
 from forge.autonomous_execution.cli import app as autonomous_execution_app
 from forge.autonomous_orchestration.cli import app as autonomous_orchestration_app
 from forge.autonomous_repair.cli import autonomous_repair_app
@@ -321,6 +322,8 @@ app.add_typer(autonomous_runtime_app, name="autonomous")
 app.add_typer(autonomous_execution_app, name="execute")
 
 app.add_typer(autonomous_orchestration_app, name="orchestrate")
+
+app.add_typer(autonomous_decision_app, name="decide")
 
 @app.command()
 def health(
