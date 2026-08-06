@@ -14,6 +14,7 @@ from forge.agent_runtime.cli import agent_app
 from forge.agents import RepositoryAuditAgent
 from forge.autonomous_decision.cli import app as autonomous_decision_app
 from forge.autonomous_execution.cli import app as autonomous_execution_app
+from forge.autonomous_memory.cli import app as autonomous_memory_app
 from forge.autonomous_orchestration.cli import app as autonomous_orchestration_app
 from forge.autonomous_repair.cli import autonomous_repair_app
 from forge.autonomous_runtime.cli import app as autonomous_runtime_app
@@ -846,4 +847,4 @@ def show_memory() -> None:
 def version() -> None:
     """Print the installed platform version."""
     console.print(__version__)
-
+app.add_typer(autonomous_memory_app, name="autonomous-memory")
