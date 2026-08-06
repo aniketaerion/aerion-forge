@@ -30,6 +30,12 @@ from forge.domain_intelligence.phase_validation.policies import (
     resolve_phase_repository_root,
     validate_phase_request,
 )
+from forge.domain_intelligence.phase_validation.reporting import (
+    PhaseValidationReportSummary,
+    phase_validation_report_markdown,
+    phase_validation_report_summary,
+    write_phase_validation_report_bundle,
+)
 
 __all__ = [
     "PhaseFindingSeverity",
@@ -44,6 +50,7 @@ __all__ = [
     "PhaseValidationPolicy",
     "PhaseValidationPolicyError",
     "PhaseValidationReport",
+    "PhaseValidationReportSummary",
     "PhaseValidationRequest",
     "PhaseValidationResult",
     "PhaseValidationStatus",
@@ -51,7 +58,10 @@ __all__ = [
     "phase_validation_check_identifier",
     "phase_validation_finding_identifier",
     "phase_validation_report_identifier",
+    "phase_validation_report_markdown",
+    "phase_validation_report_summary",
     "phase_validation_result_identifier",
     "resolve_phase_repository_root",
     "validate_phase_request",
+    "write_phase_validation_report_bundle",
 ]
