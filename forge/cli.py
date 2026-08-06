@@ -16,6 +16,7 @@ from forge.autonomous_decision.cli import app as autonomous_decision_app
 from forge.autonomous_execution.cli import app as autonomous_execution_app
 from forge.autonomous_memory.cli import app as autonomous_memory_app
 from forge.autonomous_orchestration.cli import app as autonomous_orchestration_app
+from forge.autonomous_planning.cli import app as autonomous_planning_app
 from forge.autonomous_repair.cli import autonomous_repair_app
 from forge.autonomous_runtime.cli import app as autonomous_runtime_app
 from forge.build_verification.cli import build_verification_app
@@ -848,3 +849,4 @@ def version() -> None:
     """Print the installed platform version."""
     console.print(__version__)
 app.add_typer(autonomous_memory_app, name="autonomous-memory")
+app.add_typer(autonomous_planning_app, name="autonomous-planning")
