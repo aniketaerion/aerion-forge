@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$RepositoryRoot = "D:\Software Dev\Aerion Forge",
     [string]$FeatureBranch = "feature/m4.8-phase-validation-intelligence",
@@ -10,25 +10,31 @@ param(
 $ErrorActionPreference = "Stop"
 Set-Location $RepositoryRoot
 
-function Assert-CommandSuccess {
-    param([Parameter(Mandatory)][string]$Name)
+function Assert-LastExitCode {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name
+    )
 
     if ($LASTEXITCODE -ne 0) {
         throw "$Name failed with exit code $LASTEXITCODE"
     }
 }
 
-function Invoke-Step {
+function Invoke-ReleaseStep {
     param(
-        [Parameter(Mandatory)][string]$Name,
-        [Parameter(Mandatory)][scriptblock]$Command
+        [Parameter(Mandatory)]
+        [string]$Name,
+
+        [Parameter(Mandatory)]
+        [scriptblock]$Command
     )
 
     Write-Host ""
     Write-Host "RUNNING: $Name" -ForegroundColor Cyan
 
     & $Command
-    Assert-CommandSuccess $Name
+    Assert-LastExitCode $Name
 
     Write-Host "PASS: $Name" -ForegroundColor Green
 }
@@ -56,29 +62,35 @@ foreach ($Path in $RequiredFiles) {
 }
 
 $CurrentBranch = git branch --show-current
-Assert-CommandSuccess "Read current branch"
+Assert-LastExitCode "Read current branch"
 
 if ($CurrentBranch -ne $FeatureBranch) {
-    throw "Release must start from '$FeatureBranch'. Current branch: '$CurrentBranch'."
+    throw "Release must start from $FeatureBranch. Current branch: $CurrentBranch"
 }
 
 $TrackedChanges = @(git status --short --untracked-files=no)
-Assert-CommandSuccess "Read tracked working-tree status"
+Assert-LastExitCode "Read tracked working-tree status"
 
 if ($TrackedChanges.Count -gt 0) {
-    $TrackedChanges | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
-    throw "Commit or restore tracked changes before releasing Phase 4."
+    Write-Host ""
+    Write-Host "Tracked changes must be committed first:" -ForegroundColor Yellow
+
+    foreach ($Line in $TrackedChanges) {
+        Write-Host $Line -ForegroundColor Yellow
+    }
+
+    throw "Tracked working tree is not clean."
 }
 
-Invoke-Step "Fetch origin" {
+Invoke-ReleaseStep "Fetch origin" {
     git fetch origin --tags --prune
 }
 
-Invoke-Step "Verify feature branch is pushed" {
+Invoke-ReleaseStep "Verify feature branch is pushed" {
     git diff --exit-code "origin/$FeatureBranch..$FeatureBranch"
 }
 
-Invoke-Step "Phase 4 completion validation" {
+Invoke-ReleaseStep "Phase 4 completion validation" {
     powershell.exe `
         -NoLogo `
         -NoProfile `
@@ -87,107 +99,106 @@ Invoke-Step "Phase 4 completion validation" {
         -RepositoryRoot $RepositoryRoot
 }
 
-$ExistingLocalTag = git tag --list $ReleaseTag
-Assert-CommandSuccess "Check local release tag"
+$LocalTag = git tag --list $ReleaseTag
+Assert-LastExitCode "Check local release tag"
 
-$ExistingRemoteTag = git ls-remote --tags origin "refs/tags/$ReleaseTag"
-Assert-CommandSuccess "Check remote release tag"
+$RemoteTag = git ls-remote `
+    --tags `
+    origin `
+    "refs/tags/$ReleaseTag"
 
-if ($ExistingLocalTag -or $ExistingRemoteTag) {
+Assert-LastExitCode "Check remote release tag"
+
+if ($LocalTag -or $RemoteTag) {
     throw "Release tag already exists: $ReleaseTag"
 }
 
-Invoke-Step "Switch to main" {
+Invoke-ReleaseStep "Switch to main" {
     git switch $MainBranch
 }
 
-Invoke-Step "Update main" {
+Invoke-ReleaseStep "Update main" {
     git pull --ff-only origin $MainBranch
 }
 
-Invoke-Step "Fast-forward merge Phase 4" {
+Invoke-ReleaseStep "Fast-forward merge Phase 4" {
     git merge --ff-only $FeatureBranch
 }
 
 $MainCommit = git rev-parse HEAD
-Assert-CommandSuccess "Read merged commit"
+Assert-LastExitCode "Read main commit"
 
 $FeatureCommit = git rev-parse $FeatureBranch
-Assert-CommandSuccess "Read feature commit"
+Assert-LastExitCode "Read feature commit"
 
 if ($MainCommit -ne $FeatureCommit) {
-    throw "Main does not exactly match the feature branch after merge."
+    throw "Main does not match the feature branch after merge."
 }
 
-Invoke-Step "Create annotated Phase 4 tag" {
-    git tag -a $ReleaseTag -m "Aerion Forge Phase 4 complete"
+Invoke-ReleaseStep "Create Phase 4 release tag" {
+    git tag `
+        -a $ReleaseTag `
+        -m "Aerion Forge Phase 4 complete"
 }
 
 if (-not $SkipPush) {
-    Invoke-Step "Push main" {
+    Invoke-ReleaseStep "Push main" {
         git push origin $MainBranch
     }
 
-    Invoke-Step "Push release tag" {
+    Invoke-ReleaseStep "Push release tag" {
         git push origin $ReleaseTag
     }
 }
+else {
+    Write-Host ""
+    Write-Host "Push skipped." -ForegroundColor Yellow
+}
 
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$ReportRoot = Join-Path $RepositoryRoot "reports\phase4-release\$Timestamp"
-New-Item -ItemType Directory -Path $ReportRoot -Force | Out-Null
+$ReportRoot = Join-Path `
+    $RepositoryRoot `
+    "reports\phase4-release\$Timestamp"
 
-$ReleaseReportPath = Join-Path $ReportRoot "PHASE4_RELEASE_SUMMARY.md"
-$StatusLines = @(git status --short)
-$HistoryLines = @(git log --oneline --decorate -12)
+New-Item `
+    -ItemType Directory `
+    -Path $ReportRoot `
+    -Force |
+    Out-Null
 
-$Summary = @(
-    "# Aerion Forge Phase 4 Release",
-    "",
+$ReportPath = Join-Path `
+    $ReportRoot `
+    "PHASE4_RELEASE_SUMMARY.txt"
+
+$ReportLines = @(
+    "AERION FORGE PHASE 4 RELEASE",
     "Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')",
+    "Status: COMPLETE",
+    "Branch: $MainBranch",
+    "Commit: $MainCommit",
+    "Tag: $ReleaseTag",
+    "Push performed: $(-not $SkipPush)",
     "",
-    "## Release",
+    "VALIDATION",
+    "Ruff: PASS",
+    "MyPy: PASS",
+    "Full test suite: PASS",
+    "Phase 4 architecture: PASS",
+    "Phase 4 milestone completion: PASS",
     "",
-    "| Field | Value |",
-    "|---|---|",
-    "| Status | **COMPLETE** |",
-    "| Branch | ``$MainBranch`` |",
-    "| Commit | ``$MainCommit`` |",
-    "| Tag | ``$ReleaseTag`` |",
-    "| Push performed | ``$(-not $SkipPush)`` |",
-    "",
-    "## Validation",
-    "",
-    "- Ruff passed",
-    "- MyPy passed",
-    "- Full test suite passed",
-    "- Phase 4 architecture validation passed",
-    "- Phase 4 milestone completion validations passed",
-    "",
-    "## Working Tree",
-    "",
-    "```text"
+    "RECENT HISTORY"
 )
 
-if ($StatusLines.Count -eq 0) {
-    $Summary += "Clean"
-}
-else {
-    $Summary += $StatusLines
-}
+$RecentHistory = @(git log --oneline --decorate -12)
+Assert-LastExitCode "Read release history"
 
-$Summary += @(
-    "```",
-    "",
-    "## Recent History",
-    "",
-    "```text"
+$ReportLines += $RecentHistory
+
+[System.IO.File]::WriteAllLines(
+    $ReportPath,
+    $ReportLines,
+    [System.Text.UTF8Encoding]::new($false)
 )
-
-$Summary += $HistoryLines
-$Summary += "```"
-
-$Summary | Out-File -FilePath $ReleaseReportPath -Encoding utf8
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
@@ -195,7 +206,8 @@ Write-Host "PHASE 4 RELEASE COMPLETE" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "Main commit: $MainCommit"
 Write-Host "Release tag: $ReleaseTag"
-Write-Host "Report:      $ReleaseReportPath"
+Write-Host "Report:      $ReportPath"
+Write-Host ""
 
 git status --short
 git log --oneline --decorate -10
