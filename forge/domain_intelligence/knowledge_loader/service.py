@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+from forge.domain_intelligence.knowledge_loader.chunking import (
+    chunk_documents,
+)
+from forge.domain_intelligence.knowledge_loader.compatibility import (
+    analyze_knowledge_compatibility,
+)
 from forge.domain_intelligence.knowledge_loader.discovery import (
     discover_knowledge_sources,
 )
@@ -25,6 +31,10 @@ from forge.domain_intelligence.knowledge_loader.registry import (
 )
 from forge.domain_intelligence.knowledge_loader.resolver import (
     resolve_knowledge_project_root,
+)
+from forge.domain_intelligence.knowledge_loader.validation import (
+    validate_chunks,
+    validate_documents,
 )
 
 
@@ -71,16 +81,40 @@ class KnowledgeLoaderService:
             repository_root
         ).as_posix()
 
+        chunks = chunk_documents(
+            documents,
+            chunk_size=request.chunk_size,
+        )
+
         manifest = build_knowledge_manifest(
             relative_root,
             sources,
             documents,
+        ).model_copy(
+            update={
+                "chunk_ids": tuple(
+                    chunk.chunk_id for chunk in chunks
+                )
+            }
+        )
+
+        findings = (
+            *analyze_knowledge_compatibility(
+                sources,
+                documents,
+            ),
+            *validate_documents(documents),
+            *validate_chunks(chunks),
         )
 
         payload = {
             "manifest_id": manifest.manifest_id,
             "source_ids": manifest.source_ids,
             "document_ids": manifest.document_ids,
+            "chunk_ids": manifest.chunk_ids,
+            "finding_ids": tuple(
+                finding.finding_id for finding in findings
+            ),
         }
 
         return KnowledgeLoadReport(
@@ -88,4 +122,6 @@ class KnowledgeLoaderService:
             manifest=manifest,
             sources=sources,
             documents=documents,
+            chunks=chunks,
+            findings=findings,
         )

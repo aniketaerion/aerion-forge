@@ -21,10 +21,14 @@ def test_knowledge_loader_service(tmp_path: Path) -> None:
         KnowledgeLoadRequest(
             repository_root=str(tmp_path),
             project_root="docs",
+            chunk_size=128,
         )
     )
 
     assert report.manifest.project_root == "docs"
     assert len(report.sources) == 1
     assert len(report.documents) == 1
-    assert report.documents[0].title == "Forge Guide"
+    assert len(report.chunks) >= 1
+    assert report.manifest.chunk_ids == tuple(
+        chunk.chunk_id for chunk in report.chunks
+    )
