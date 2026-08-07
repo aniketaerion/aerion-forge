@@ -57,6 +57,13 @@ def test_valid_transition_is_allowed() -> None:
     )
 
 
+def test_approved_planning_stage_can_resume_from_approval() -> None:
+    assert can_transition(
+        AgentSessionStatus.AWAITING_APPROVAL,
+        AgentSessionStatus.PLANNING,
+    )
+
+
 def test_invalid_transition_is_rejected() -> None:
     with pytest.raises(AgentRuntimeStateError):
         transition_session(

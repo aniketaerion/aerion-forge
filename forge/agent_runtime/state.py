@@ -36,6 +36,7 @@ _ALLOWED_TRANSITIONS: dict[
     ),
     AgentSessionStatus.AWAITING_APPROVAL: frozenset(
         {
+            AgentSessionStatus.PLANNING,
             AgentSessionStatus.EXECUTING,
             AgentSessionStatus.REPAIRING,
             AgentSessionStatus.VERIFYING,
