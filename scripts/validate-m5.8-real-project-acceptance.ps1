@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$RepositoryRoot = "D:\Software Dev\Aerion Forge",
     [string]$AcceptanceRoot = "D:\Software Dev\Aerion Forge Acceptance"
@@ -105,6 +105,31 @@ pythonpath = ["."]
 
 Disposable external repository for Aerion Forge M5.8 acceptance validation.
 '@ | Set-Content ".\README.md" -Encoding utf8
+
+# Normalize generated acceptance repository files to UTF-8 without BOM.
+$Utf8NoBomFiles = @(
+    ".\src\calculator.py",
+    ".\tests\test_calculator.py",
+    ".\pyproject.toml",
+    ".\README.md"
+)
+
+foreach ($Utf8File in $Utf8NoBomFiles) {
+    if (-not (Test-Path $Utf8File)) {
+        throw "Missing generated acceptance fixture: $Utf8File"
+    }
+
+    $Utf8Content = Get-Content $Utf8File -Raw
+
+    [System.IO.File]::WriteAllText(
+        (Resolve-Path $Utf8File),
+        $Utf8Content,
+        [System.Text.UTF8Encoding]::new($false)
+    )
+}
+
+Write-Host "Acceptance fixtures normalized to UTF-8 no-BOM." `
+    -ForegroundColor Green
 
 git add .
 git commit -m "test: establish acceptance baseline" | Out-Null
