@@ -230,6 +230,10 @@ $ChangedFiles = @(
             if ($_.Length -ge 4) {
                 $_.Substring(3).Replace("\", "/")
             }
+        } |
+        Where-Object {
+            $_ -notmatch '(^|/)__pycache__($|/)' -and
+            $_ -notmatch '\.pyc$'
         }
 )
 
