@@ -94,6 +94,7 @@ from forge.knowledge.validator import KnowledgeGraphValidator
 from forge.memory import JsonMemoryStore
 from forge.mission_orchestration.cli import mission_orchestration_app
 from forge.mission_reporting.cli import report_app
+from forge.mission_runtime.cli import app as mission_runtime_app
 from forge.planning.cli import mission_app
 from forge.safe_change_planning.cli import safe_change_app
 from forge.safe_code_editing.cli import edit_app
@@ -120,6 +121,7 @@ app.add_typer(impact_app, name="impact")
 app.add_typer(memory_app, name="memory")
 app.add_typer(report_app, name="report")
 app.add_typer(mission_orchestration_app, name="orchestrate")
+app.add_typer(mission_runtime_app, name="mission-runtime")
 app.add_typer(execution_app, name="execution")
 app.add_typer(safe_change_app, name="safe-change")
 app.add_typer(repair_app, name="repair")
