@@ -39,6 +39,11 @@ from forge.general_engineering.models import (
     ValidationOutcome,
     ValidationPlan,
 )
+from forge.general_engineering.normalization import (
+    normalize_optional_items,
+    normalize_repository_path,
+    normalize_text,
+)
 from forge.general_engineering.policies import (
     EngineeringLimits,
     EngineeringSafetyPolicy,
@@ -47,6 +52,17 @@ from forge.general_engineering.policies import (
     is_forbidden_path,
 )
 from forge.general_engineering.protocols import EngineeringProvider
+from forge.general_engineering.request_builder import (
+    build_engineering_request,
+)
+from forge.general_engineering.request_understanding import (
+    EngineeringRequestUnderstandingService,
+    RequestUnderstandingResult,
+    engineering_request_understanding_service,
+)
+from forge.general_engineering.requirement_extractor import (
+    extract_change_requirements,
+)
 from forge.general_engineering.states import (
     EditOperationType,
     EngineeringRisk,
@@ -72,6 +88,7 @@ __all__ = [
     "EngineeringProviderError",
     "EngineeringRepairError",
     "EngineeringRequest",
+    "EngineeringRequestUnderstandingService",
     "EngineeringRisk",
     "EngineeringSafetyPolicy",
     "EngineeringScopeError",
@@ -87,9 +104,11 @@ __all__ = [
     "RepairDisposition",
     "RepairProposal",
     "RepositoryEvidence",
+    "RequestUnderstandingResult",
     "ValidationOutcome",
     "ValidationPlan",
     "ValidationStatus",
+    "build_engineering_request",
     "change_plan_identifier",
     "change_requirement_identifier",
     "change_set_identifier",
@@ -97,7 +116,12 @@ __all__ = [
     "edit_operation_identifier",
     "engineering_evidence_identifier",
     "engineering_request_identifier",
+    "engineering_request_understanding_service",
+    "extract_change_requirements",
     "is_forbidden_path",
+    "normalize_optional_items",
+    "normalize_repository_path",
+    "normalize_text",
     "repair_proposal_identifier",
     "repository_evidence_identifier",
     "validation_outcome_identifier",
