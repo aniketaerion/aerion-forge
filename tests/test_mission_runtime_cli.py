@@ -10,7 +10,13 @@ runner = CliRunner()
 
 def initialize_repository(tmp_path: Path) -> None:
     (tmp_path / ".git").mkdir()
+    (tmp_path / "src").mkdir()
 
+    (tmp_path / "src" / "calculator.py").write_text(
+        "def add(a: int, b: int) -> int:\n"
+        "    return a + b\n",
+        encoding="utf-8",
+    )
 
 def test_mission_runtime_about_command() -> None:
     result = runner.invoke(app, ["about"])
@@ -36,7 +42,7 @@ def test_mission_runtime_run_creates_persisted_session(
         app,
         [
             "run",
-            "Plan calculator change",
+            "Add subtract(a: int, b: int) -> int to src/calculator.py and change nothing else.",
             "--repository-root",
             str(tmp_path),
         ],
@@ -56,7 +62,7 @@ def test_mission_runtime_run_and_approve(
         app,
         [
             "run",
-            "Plan calculator change",
+            "Add subtract(a: int, b: int) -> int to src/calculator.py and change nothing else.",
             "--repository-root",
             str(tmp_path),
             "--json",
@@ -79,4 +85,4 @@ def test_mission_runtime_run_and_approve(
     )
 
     assert approved.exit_code == 0
-    assert "Status: completed" in approved.stdout
+    assert "Status: awaiting_approval" in approved.stdout

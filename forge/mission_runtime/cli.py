@@ -9,7 +9,7 @@ from typing import Annotated
 import typer
 
 from forge.mission_runtime.runner import (
-    approve_plan,
+    approve_current_boundary,
     list_sessions,
     load_session,
     run_objective,
@@ -81,8 +81,8 @@ def approve(
         typer.Option("--reason"),
     ] = "approved",
 ) -> None:
-    """Approve the plan boundary and resume the mission."""
-    result = approve_plan(
+    """Approve the current mission boundary and resume execution."""
+    result = approve_current_boundary(
         session_id=session_id,
         repository_root=repository_root,
         approved_by=approved_by,
