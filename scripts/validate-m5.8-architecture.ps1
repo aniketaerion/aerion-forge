@@ -18,7 +18,7 @@ function Assert-Exists {
     }
 }
 
-$ExpectedBranch = "feature/m5.8-autonomous-agent-runtime"
+$ExpectedBranch = "feature/m5.8-package5-production-runtime-cli"
 $CurrentBranch = git branch --show-current
 
 if ($LASTEXITCODE -ne 0) {
@@ -69,7 +69,8 @@ $RuntimeFiles = @(
     ".\forge\mission_runtime\repository.py",
     ".\forge\mission_runtime\reporting.py",
     ".\forge\mission_runtime\service.py",
-    ".\forge\mission_runtime\cli.py"
+    ".\forge\mission_runtime\cli.py",
+    ".\forge\mission_runtime\runner.py"
 )
 
 $PackageScripts = @(
@@ -78,7 +79,9 @@ $PackageScripts = @(
     ".\scripts\implement-m5.8-package1.ps1",
     ".\scripts\implement-m5.8-package2.ps1",
     ".\scripts\implement-m5.8-package3.ps1",
-    ".\scripts\implement-m5.8-package4.ps1"
+    ".\scripts\implement-m5.8-package4.ps1",
+    ".\scripts\implement-m5.8-package5.ps1",
+    ".\scripts\implement-m5.8-package5b.ps1"
 )
 
 foreach ($Path in $ArchitectureFiles + $RuntimeFiles + $PackageScripts) {
@@ -134,16 +137,33 @@ if ($RootCli -notmatch 'name="mission-runtime"') {
     throw "Root Forge CLI does not register the mission-runtime command group."
 }
 
+$MissionRuntimePythonFiles = Get-ChildItem `
+    ".\forge\mission_runtime" `
+    -Filter "*.py" `
+    -File |
+    Where-Object {
+        $_.Name -ne "runner.py"
+    }
+
 $ForbiddenRuntimeImports = Select-String `
-    -Path ".\forge\mission_runtime\*.py" `
+    -Path $MissionRuntimePythonFiles.FullName `
     -Pattern "from forge\.agent_runtime|from forge\.agents|multi_agent|multi-agent" `
     -ErrorAction SilentlyContinue
 
 if ($ForbiddenRuntimeImports) {
     $ForbiddenRuntimeImports
-    throw "M5.8 Mission Runtime contains forbidden multi-agent/runtime coupling."
+    throw "Mission Runtime modules other than runner.py contain forbidden Agent Runtime or multi-agent coupling."
 }
 
+$Runner = Get-Content ".\forge\mission_runtime\runner.py" -Raw
+
+if ($Runner -notmatch "forge\.agent_runtime\.production_service") {
+    throw "Mission Runtime runner.py does not use the approved production Agent Runtime bridge."
+}
+
+if ($Runner -match "multi_agent|multi-agent|forge\.agents") {
+    throw "Mission Runtime runner.py contains forbidden multi-agent coupling."
+}
 Write-Host ""
 Write-Host "M5.8 ARCHITECTURE VALIDATION PASSED" -ForegroundColor Green
 Write-Host "Architecture documents: $($ArchitectureFiles.Count)"

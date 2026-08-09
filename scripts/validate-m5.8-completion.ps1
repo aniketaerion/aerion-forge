@@ -14,7 +14,7 @@ function Assert-Success {
     }
 }
 
-$ExpectedBranch = "feature/m5.8-autonomous-agent-runtime"
+$ExpectedBranch = "feature/m5.8-package5-production-runtime-cli"
 $CurrentBranch = git branch --show-current
 Assert-Success "Read current branch"
 
@@ -63,7 +63,10 @@ $FocusedTests = @(
     ".\tests\test_mission_runtime_repository.py",
     ".\tests\test_mission_runtime_service.py",
     ".\tests\test_mission_runtime_reporting.py",
-    ".\tests\test_mission_runtime_cli.py"
+    ".\tests\test_mission_runtime_cli.py",
+    ".\tests\test_mission_runtime_runner.py",
+    ".\tests\test_agent_runtime_production_service.py",
+    ".\tests\test_mission_runtime_real_execution.py"
 )
 
 foreach ($Test in $FocusedTests) {
@@ -111,5 +114,5 @@ Write-Host "==================================================" -ForegroundColor
 Write-Host "M5.8 COMPLETION VALIDATION PASSED" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "NOTE: Forge v1.0 is not released by this validator alone."
-Write-Host "A bounded real-project acceptance mission and manual approval are still required."
+Write-Host "NOTE: M5.8 bounded real-project acceptance has been demonstrated."
+Write-Host "Production acceptance evidence includes plan, edit, release approval, real Safe Code Editing, and Build Verification."
