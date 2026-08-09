@@ -14,12 +14,12 @@ function Assert-Success {
     }
 }
 
-$ExpectedBranch = "feature/m5.8-package5-production-runtime-cli"
+$AllowedBranches = @("main", "feature/m5.8-package5-production-runtime-cli")
 $CurrentBranch = git branch --show-current
 Assert-Success "Read current branch"
 
-if ($CurrentBranch -ne $ExpectedBranch) {
-    throw "M5.8 completion validation must run on '$ExpectedBranch'. Current branch: '$CurrentBranch'."
+if ($CurrentBranch -notin $AllowedBranches) {
+    throw "M5.8 completion validation must run on an approved branch: $($AllowedBranches -join ', '). Current branch: '$CurrentBranch'."
 }
 
 Write-Host ""

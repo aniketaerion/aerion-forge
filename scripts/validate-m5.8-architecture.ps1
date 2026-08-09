@@ -18,15 +18,15 @@ function Assert-Exists {
     }
 }
 
-$ExpectedBranch = "feature/m5.8-package5-production-runtime-cli"
+$AllowedBranches = @("main", "feature/m5.8-package5-production-runtime-cli")
 $CurrentBranch = git branch --show-current
 
 if ($LASTEXITCODE -ne 0) {
     throw "Unable to read current Git branch."
 }
 
-if ($CurrentBranch -ne $ExpectedBranch) {
-    throw "M5.8 architecture validation must run on '$ExpectedBranch'. Current branch: '$CurrentBranch'."
+if ($CurrentBranch -notin $AllowedBranches) {
+    throw "M5.8 architecture validation must run on an approved branch: $($AllowedBranches -join ', '). Current branch: '$CurrentBranch'."
 }
 
 $ArchitectureFiles = @(
